@@ -1,116 +1,90 @@
 <?php
 
-include_once dirname(__FILE__) . '/../../yarn/CoastSerializableFunctions.php';
+include_once dirname(__FILE__) . '/Protocol.php';
+include_once dirname(__FILE__) . '/ModifyProtocol.php';
 
 /**
  * Class ActionProtocol
- * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * Dr. Dipl.-Inf. Thomas M. Prinz
  */
-class ActionProtocol {
+abstract class ActionProtocol extends Protocol {
 
     /**
-     * A register of closures.
-     * @var array Closure
+     * The class of the implementation of the modify abstract class.
+     * @var string
      */
-    private $actionRegister = array();
+    private $implementation;
 
     /**
-     * The API handler
-     * @var \Slim\Slim
+     * The controller.
+     * @var string
      */
-    private $app = null;
+    protected $controller;
 
     /**
-     * Unregistered actions.
+     * The method.
+     * @var string
+     */
+    protected $method;
+
+    /**
+     * An array of parameters.
      * @var array
      */
-    private $unregistered = array();
+    protected $parameters = array();
 
     /**
-     * The only instance.
-     * @var ActionProtocol
+     * @inheritDoc
      */
-    private static $singleton = false;
-
-    /**
-     * Create or get the singleton action protocol instance.
-     * @param \Slim\Slim $app
-     * @return ActionProtocol
-     */
-    public static function instance(\Slim\Slim $app = null) {
-        if (!ActionProtocol::$singleton) {
-            ActionProtocol::$singleton = new ActionProtocol($app);
-        } else {
-            if ($app !== null) {
-                ActionProtocol::$singleton->app = $app;
-            }
-        }
-        return ActionProtocol::$singleton;
+    public function __construct(ModifyProtocol $parent, $controller, $method, $implementation, $parameters = array()) {
+        parent::__construct($parent);
+        $this->implementation = $implementation;
+        $this->controller = $controller;
+        $this->method = $method;
+        $this->parameters = $parameters;
     }
 
     /**
-     * ActionProtocol constructor.
-     * @param \Slim\Slim $app The slim app.
+     * Generate a success branch.
+     * @return ModifyProtocol
      */
-    private function __construct(\Slim\Slim $app = null) {
-        $this->app = $app;
+    public function success() {
+        $impl = $this->implementation;
+        $obj = new $impl($this);
+        $this->protocol[] = array(
+            "operation" => "success",
+            "protocol"  => $obj
+        );
+        return $obj;
     }
 
     /**
-     * Register a controller.
-     * @param $className
+     * Generate an error branch.
+     * @return ModifyProtocol
      */
-    public function register($className) {
-        $clazz = new ReflectionClass($className);
-        $obj = new $className;
-        if ($this->app) {
-            foreach ($clazz->getMethods() as $method) {
-                $this->app->post('/:user/api/' . $method->getName(),
-                    function ($user) use ($obj, $method) {
-                        $closure = $method->getClosure($obj);
-
-                        // Get the json object with all information
-                        $json = $this->app->request()->getBody();
-                        $params = simpleJsonDecode($json);
-
-                        $params = array_map(function(ReflectionParameter $param) use ($params) {
-                            $name = $param->getName();
-                            $type = $param->getClass();
-                            if ($type !== null && !Tools::isScalar($type->name)) {
-                                return call_user_func($type->name . '::get', $params[$name]);
-                            } else return $params[$name];
-                        }, $method->getParameters());
-
-                        $retValue = call_user_func_array($closure, $params);
-
-                        if (is_string($retValue)) {
-                            $response = $this->app->response;
-                            $response->headers->set('Content-Type', 'text/html; charset=utf-8');
-                            $response->status(200);
-                            $response->body($retValue);
-                        } else if (is_array($retValue)) {
-                            $response = $this->app->response;
-                            $response->headers->set('Content-Type', 'application/json; charset=utf-8');
-                            $response->status(200);
-                            $response->body(simpleJsonEncode($retValue));
-                        } else if ($retValue instanceof View) {
-                            if ($retValue instanceof HtmlView) {
-                                $response = $this->app->response;
-                                $response->headers->set('Content-Type', 'text/html; charset=utf-8');
-                                $response->status(200);
-                                $response->body(
-                                    $retValue->generate() .
-                                    '<style type="text/css">' . $retValue->generateStyle() . '</style>' .
-                                    '<script>' . $retValue->generateJS() . '</script>'
-                                );
-                            }
-                        } else {
-                            echo "ERROR";
-                        }
-                    }
-                );
-            }
-        }
+    public function error() {
+        $impl = $this->implementation;
+        $obj = new $impl($this);
+        $this->protocol[] = array(
+            "operation" => "error",
+            "protocol"  => $obj
+    );
+        return $obj;
     }
+
+    /**
+     * Generate a eventually branch.
+     * @return ModifyProtocol
+     */
+    public function eventually() {
+        $impl = $this->implementation;
+        $obj = new $impl($this);
+        $this->protocol[] = array(
+            "operation" => "eventually",
+            "protocol"  => $obj
+    );
+        return $obj;
+    }
+
 }
 ?>
