@@ -26,6 +26,12 @@ abstract class DirectView {
     public abstract function protocol($event);
 
     /**
+     * The access is granted if the access is set.
+     * @param string|array $access
+     */
+    public abstract function access($access);
+
+    /**
      * Get an object of the view.
      * @param string $id The id.
      * @return DirectView

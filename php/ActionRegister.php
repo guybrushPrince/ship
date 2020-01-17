@@ -65,62 +65,86 @@ class ActionRegister {
         $obj = new $className;
         if ($this->app) {
             foreach ($clazz->getMethods() as $method) {
-                $this->app->post('/:user/api/' . $method->getName(),
-                    function ($user) use ($obj, $method) {
-                        $closure = $method->getClosure($obj);
+                $fun = function ($user = false, $group = false) use ($obj, $method) {
+                    $closure = $method->getClosure($obj);
 
-                        // Get the json object with all information
-                        $json = $this->app->request()->getBody();
-                        $params = simpleJsonDecode($json);
+                    // Start session if possible
+                    if (isset($_SESSION) && array_key_exists("idCounter", $_SESSION)) {
+                        View::setIdCounter($_SESSION["idCounter"]);
+                    }
 
-                        $params = array_map(function(ReflectionParameter $param) use ($params) {
-                            $name = $param->getName();
-                            $type = $param->getClass();
-                            if ($type !== null && !Tools::isScalar($type->name)) {
-                                return call_user_func($type->name . '::get', $params[$name]);
-                            } else return $params[$name];
-                        }, $method->getParameters());
+                    // Get the json object with all information
+                    $json = $this->app->request()->getBody();
+                    $params = simpleJsonDecode($json);
 
-                        $retValue = call_user_func_array($closure, $params);
+                    $params = array_map(function(ReflectionParameter $param) use ($params) {
+                        $name = $param->getName();
+                        $type = $param->getClass();
+                        if ($type !== null && !Tools::isScalar($type->name)) {
+                            return call_user_func($type->name . '::get', $params[$name]);
+                        } else return $params[$name];
+                    }, $method->getParameters());
 
-                        if (is_string($retValue)) {
+                    $retValue = call_user_func_array($closure, $params);
+
+                    if (is_string($retValue)) {
+                        if (preg_match('/@CSV(.*)/', $method->getDocComment(), $matches) >= 1) {
+                            $response = $this->app->response;
+                            $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+                            $response->headers->set('Content-Disposition', 'attachment;filename=survey_data.csv');
+                            $response->status(200);
+                            $response->body($retValue);
+                        } else {
                             $response = $this->app->response;
                             $response->headers->set('Content-Type', 'text/html; charset=utf-8');
                             $response->status(200);
                             $response->body($retValue);
-                        } else if (is_array($retValue)) {
-                            $response = $this->app->response;
-                            $response->headers->set('Content-Type', 'application/json; charset=utf-8');
-                            $response->status(200);
-                            $response->body(simpleJsonEncode($retValue));
-                        } else if (is_bool($retValue)) {
-                            $response = $this->app->response;
-                            $response->headers->set('Content-Type', 'application/json; charset=utf-8');
-                            $response->status(200);
-                            $response->body(simpleJsonEncode($retValue));
-                        } else if ($retValue instanceof View) {
-                            if ($retValue instanceof HtmlView) {
-                                $response = $this->app->response;
-                                $response->headers->set('Content-Type', 'text/html; charset=utf-8');
-                                $response->status(200);
-                                $response->body(
-                                    $retValue->generate() .
-                                    '<style type="text/css">' . $retValue->generateStyle() . '</style>' .
-                                    '<script>' . $retValue->generateJS() . '</script>'
-                                );
-                            }
-                        } else if ($retValue instanceof Error) {
-                            $response = $this->app->response;
-                            $response->headers->set('Content-Type', 'application/json; charset=utf-8');
-                            $response->status(404);
-                            $response->body(
-                                fullJsonEncode($retValue)
-                            );
-                        } else {
-                            echo "ERROR";
                         }
+                    } else if (is_array($retValue)) {
+                        $response = $this->app->response;
+                        $response->headers->set('Content-Type', 'application/json; charset=utf-8');
+                        $response->status(200);
+                        $response->body(simpleJsonEncode($retValue));
+                    } else if (is_bool($retValue)) {
+                        $response = $this->app->response;
+                        $response->headers->set('Content-Type', 'application/json; charset=utf-8');
+                        $response->status(200);
+                        $response->body(simpleJsonEncode($retValue));
+                    } else if ($retValue instanceof View) {
+                        if ($retValue instanceof HtmlView) {
+                            $response = $this->app->response;
+                            $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+                            $response->status(200);
+                            $response->body(
+                                $retValue->generate() .
+                                (!($retValue instanceof ApplicationHtmlView) ?
+                                    '<style type="text/css">' . $retValue->generateStyle() . '</style>' .
+                                    '<script>' . $retValue->generateJS() . '</script>' : '')
+                            );
+                        }
+                    } else if ($retValue instanceof Error) {
+                        $response = $this->app->response;
+                        $response->headers->set('Content-Type', 'application/json; charset=utf-8');
+                        $response->status(404);
+                        $response->body(
+                            fullJsonEncode($retValue)
+                        );
+                    } else {
+                        echo "ERROR";
                     }
-                );
+                    if (isset($_SESSION) && array_key_exists('rights', $_SESSION)) {
+                        unset($_SESSION["rights"]);
+                    }
+                };
+                $isGet = (preg_match('/@get(.*)/', $method->getDocComment(), $matches) >= 1);
+                $without = (preg_match('/@without(.*)/', $method->getDocComment(), $matches) >= 1);
+                if ($isGet && $isGet >= 0) {
+                    $this->app->get('/api/' . $method->getName(), $fun);
+                } else if (!$without) {
+                    $this->app->post('/:user/:group/api/' . $method->getName(), $fun);
+                } else {
+                    $this->app->post('/api/' . $method->getName(), $fun);
+                }
             }
         }
     }

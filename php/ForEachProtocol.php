@@ -24,12 +24,12 @@ abstract class ForEachProtocol extends Protocol {
     }
 
     /**
-     * Generate an else branch.
+     * Generate the body.
      * @return ModifyProtocol
      */
     public function body() {
         $this->protocol[] = array(
-            "operation" => "else"
+            "operation" => "body"
         );
         $impl = $this->implementation;
         return new $impl($this);

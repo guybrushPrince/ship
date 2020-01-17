@@ -34,14 +34,28 @@ abstract class ActionProtocol extends Protocol {
     protected $parameters = array();
 
     /**
+     * Title.
+     * @var array
+     */
+    protected $title;
+
+    /**
      * @inheritDoc
      */
-    public function __construct(ModifyProtocol $parent, $controller, $method, $implementation, $parameters = array()) {
+    public function __construct(
+        ModifyProtocol $parent,
+        $controller,
+        $method,
+        $implementation,
+        $parameters = array(),
+        $title = array()
+    ) {
         parent::__construct($parent);
         $this->implementation = $implementation;
         $this->controller = $controller;
         $this->method = $method;
         $this->parameters = $parameters;
+        $this->title = $title;
     }
 
     /**
