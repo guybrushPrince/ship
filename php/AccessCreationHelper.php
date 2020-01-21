@@ -17,7 +17,8 @@ class AccessCreationHelper {
                                      $group = false,
                                      $readRole = AccessRole::Reporter,
                                      $writeRole = AccessRole::Developer,
-                                     $deleteRole = AccessRole::Master) {
+                                     $deleteRole = AccessRole::Master,
+                                     $ignoreUserSession = false) {
         $access = $obj->getAccess();
         if (!$access) {
             $access = new Access();
@@ -28,7 +29,7 @@ class AccessCreationHelper {
         $persistence = Persistence::instance();
         if ($persistence->isSecureMode()) {
             $userSession = $persistence->getUserSession();
-            if ($userSession) {
+            if ($userSession && !$ignoreUserSession) {
                 $readRole = $userSession->getCurrentRole();
                 $writeRole = $userSession->getCurrentRole();
                 $deleteRole = $userSession->getCurrentRole();
@@ -49,6 +50,8 @@ class AccessCreationHelper {
                 $access->addAccessRights(
                     AccessCreationHelper::buildAccessRights(
                         $group,
+                        $readRole,
+                        $writeRole,
                         $deleteRole
                     )
                 );
@@ -103,17 +106,23 @@ class AccessCreationHelper {
 
     /**
      * Build current access rights.
-     * @param Group $group The current group.
-     * @param int $role The current role.
+     * @param Group $group The group.
+     * @param int $readRole The read role.
+     * @param int $writeRole The write role
+     * @param int $deleteRole The delete role.
      * @return AccessRights
      */
-    public static function buildAccessRights(Group $group, $role) {
+    public static function buildAccessRights(Group $group,
+                                             $readRole = AccessRole::Reporter,
+                                             $writeRole = AccessRole::Developer,
+                                             $deleteRole = AccessRole::Master
+    ) {
         $accessRight = new AccessRights();
-        $accessRight->setReadAccessRole($role);
+        $accessRight->setReadAccessRole($readRole);
         $accessRight->setReadAccessGroup($group);
-        $accessRight->setWriteAccessRole($role);
+        $accessRight->setWriteAccessRole($writeRole);
         $accessRight->setWriteAccessGroup($group);
-        $accessRight->setDeleteAccessRole($role);
+        $accessRight->setDeleteAccessRole($deleteRole);
         $accessRight->setDeleteAccessGroup($group);
         return $accessRight;
     }
