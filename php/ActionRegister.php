@@ -68,11 +68,6 @@ class ActionRegister {
                 $fun = function ($user = false, $group = false) use ($obj, $method) {
                     $closure = $method->getClosure($obj);
 
-                    // Start session if possible
-                    if (isset($_SESSION) && array_key_exists("idCounter", $_SESSION)) {
-                        View::setIdCounter($_SESSION["idCounter"]);
-                    }
-
                     // Get the json object with all information
                     $json = $this->app->request()->getBody();
                     $params = simpleJsonDecode($json);
