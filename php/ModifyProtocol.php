@@ -21,15 +21,25 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Append the modifiy protocol with another.
+     * @param ModifyProtocol|boolean $protocol The protocol.
+     */
+    public function append($protocol) {
+        if ($protocol) {
+            $protocol->setParent($this->parent);
+            $this->protocol = array_merge($this->protocol, $protocol->protocol);
+        }
+        return $this;
+    }
+
+    /**
      * Set a value in the context.
      * @param string $var The name of the variable
      * @param bool|string|object $new The value.
      * @return $this
      */
     public function set($var, $new = false, $scope = false) {
-        $v = $new;
-        if (is_string($new)) $v = $this->innerView()->get($new)["view"];
-        if ($v !== null) $new = $v;
+        $new = $this->detectView($new);
         $this->protocol[] = array(
             "operation" => "set",
             "key"       => $var,
@@ -71,9 +81,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false $new The new view.
      */
     public function add($view, $new = false) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "add",
             "view"      => $view,
@@ -88,9 +96,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false $new The new view.
      */
     public function after($view, $new = false) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "after",
             "view"      => $view,
@@ -105,9 +111,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false $new The new view.
      */
     public function before($view, $new = false) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "before",
             "view"      => $view,
@@ -122,9 +126,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false $new The new view.
      */
     public function replace($view, $new = false) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "replace",
             "view"      => $view,
@@ -138,9 +140,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|string $view The given view.
      */
     public function clear($view) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "clear",
             "view"      => $view
@@ -154,9 +154,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param string|array $clazz The class(es) to add.
      */
     public function addClass($view, $clazz) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
             "operation" => "addClasses",
@@ -172,12 +170,26 @@ abstract class ModifyProtocol extends Protocol {
      * @param string|array $clazz The class(es) to remove.
      */
     public function removeClass($view, $clazz) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
             "operation" => "removeClasses",
+            "view"      => $view,
+            "classes"   => $clazz
+        );
+        return $this;
+    }
+
+    /**
+     * Removes classes from all view siblings.
+     * @param DirectView|string $view The given view.
+     * @param string|array $clazz The class(es) to remove.
+     */
+    public function removeClassSiblings($view, $clazz) {
+        $view = $this->detectView($view);
+        if (!is_array($clazz)) $clazz = array( $clazz );
+        $this->protocol[] = array(
+            "operation" => "removeClassesSiblings",
             "view"      => $view,
             "classes"   => $clazz
         );
@@ -189,10 +201,8 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|string $view The given view.
      * @param string|array $clazz The class(es) to toggle.
      */
-    public function toggleClass($view, $clazz) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+    public function toggleClass($view = null, $clazz) {
+        $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
             "operation" => "toggleClasses",
@@ -208,11 +218,25 @@ abstract class ModifyProtocol extends Protocol {
      * @return $this
      */
     public function delete($view) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "delete",
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
+     * Throw an event on the view.
+     * @param integer $event The event.
+     * @param DirectView|string $view The view.
+     * @return $this
+     */
+    public function throwevent($event, $view) {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "throw",
+            "event"     => $event,
             "view"      => $view
         );
         return $this;
@@ -254,15 +278,59 @@ abstract class ModifyProtocol extends Protocol {
      * @return $this
      */
     public function event($event, $view) {
-        $v = $view;
-        if (is_string($view)) $v = $this->innerView()->get($view)["view"];
-        if ($v !== null) $view = $v;
+        $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation"  => "event",
             "event"      => $event,
             "view"      => $view
         );
         return $this;
+    }
+
+    /**
+     * For each element of an array.
+     * @param array $array The array.
+     * @param Closure $function The closure.
+     * @return $this
+     */
+    /*public function each(array $array = array(), Closure $function) {
+        $obj = new HtmlModifyProtocol($this->innerView());
+        $this->protocol[] = array(
+            "operation"  => "each",
+            "protocol"   => $obj,
+            "array"      => $array,
+            "function"    => $function
+        );
+        return $this;
+    }*/
+
+    /**
+     * Detects the view if the view is a string or returns the string itself.
+     * @param string|array $view The view(s).
+     * @return string|array|DirectView
+     */
+    protected function detectView($view) {
+        if ($view === null) return $this->innerView();
+        if (is_array($view)) {
+            $view = array_map(function($v) { return $this->detectSingleView($v); }, $view);
+        } else {
+            $view = $this->detectSingleView($view);
+        }
+        return $view;
+    }
+
+    /**
+     * Detects a single view.
+     * @param string|DirectView $view The view.
+     * @return string|DirectView
+     */
+    private function detectSingleView($view) {
+        if ($this->innerView() !== null) {
+            $v = $view;
+            if (is_string($view)) $v = $this->innerView()->get($view)["view"];
+            if ($v !== null) $view = $v;
+        }
+        return $view;
     }
 
 

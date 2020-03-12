@@ -41,6 +41,14 @@ abstract class Protocol {
      */
     public abstract function generate();
 
+    /**
+     * Set the parent.
+     * @param DirectView|Protocol $parent The parent.
+     */
+    protected function setParent($parent) {
+        $this->parent = $parent;
+    }
+
     // Short cuts.
 
     /**
@@ -58,7 +66,9 @@ abstract class Protocol {
     protected function innerView() {
         if ($this->parent instanceof DirectView) {
             return $this->parent;
-        } else {
+        } else if ($this->parent === null) {
+            return null;
+        } else  {
             return $this->parent->innerView();
         }
     }

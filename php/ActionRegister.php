@@ -9,22 +9,10 @@ include_once dirname(__FILE__) . '/../../yarn/CoastSerializableFunctions.php';
 class ActionRegister {
 
     /**
-     * A register of closures.
-     * @var array Closure
-     */
-    private $actionRegister = array();
-
-    /**
      * The API handler
      * @var \Slim\Slim
      */
     private $app = null;
-
-    /**
-     * Unregistered actions.
-     * @var array
-     */
-    private $unregistered = array();
 
     /**
      * The only instance.
@@ -111,10 +99,7 @@ class ActionRegister {
                             $response->headers->set('Content-Type', 'text/html; charset=utf-8');
                             $response->status(200);
                             $response->body(
-                                $retValue->generate() .
-                                (!($retValue instanceof ApplicationHtmlView) ?
-                                    '<style type="text/css">' . $retValue->generateStyle() . '</style>' .
-                                    '<script>' . $retValue->generateJS() . '</script>' : '')
+                                $retValue->generate(!($retValue instanceof ApplicationHtmlView))
                             );
                         }
                     } else if ($retValue instanceof Error) {
