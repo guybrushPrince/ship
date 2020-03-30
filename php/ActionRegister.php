@@ -57,14 +57,22 @@ class ActionRegister {
                     $closure = $method->getClosure($obj);
 
                     // Get the json object with all information
-                    $json = $this->app->request()->getBody();
-                    $params = simpleJsonDecode($json);
+                    if (preg_match('/@urlParameters(.*)/', $method->getDocComment(), $matches) >= 1) {
+                        $params = $this->app->request()->params();
+                    } else {
+                        $json = $this->app->request()->getBody();
+                        $params = simpleJsonDecode($json);
+                    }
 
                     $params = array_map(function(ReflectionParameter $param) use ($params) {
                         $name = $param->getName();
                         $type = $param->getClass();
                         if ($type !== null && !Tools::isScalar($type->name)) {
-                            return call_user_func($type->name . '::get', $params[$name]);
+                            $class = $type->name;
+                            $keyBinding = $class::getKeyBinding();
+                            return call_user_func($type->name . '::get',
+                                ($keyBinding === 'i' ? intval($params[$name]) : $params[$name])
+                            );
                         } else return $params[$name];
                     }, $method->getParameters());
 
@@ -118,8 +126,11 @@ class ActionRegister {
                 };
                 $isGet = (preg_match('/@get(.*)/', $method->getDocComment(), $matches) >= 1);
                 $without = (preg_match('/@without(.*)/', $method->getDocComment(), $matches) >= 1);
+                $isGetParameters = (preg_match('/@urlParameters(.*)/', $method->getDocComment(), $matches) >= 1);
                 if ($isGet && $isGet >= 0) {
                     $this->app->get('/api/' . $method->getName(), $fun);
+                } else if ($isGetParameters) {
+                    $this->app->get('/:user/:group/api/' . $method->getName(), $fun);
                 } else if (!$without) {
                     $this->app->post('/:user/:group/api/' . $method->getName(), $fun);
                 } else {
