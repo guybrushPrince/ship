@@ -1,8 +1,8 @@
 <?php
 
-include_once dirname(__FILE__) . '/../../../../ship/php/DirectView.php';
-include_once dirname(__FILE__) . '/../../../../ship/php/ActionRegister.php';
-include_once dirname(__FILE__) . '/../../model/access/ViewAccessRight.php';
+include_once dirname(__FILE__) . '/../DirectView.php';
+include_once dirname(__FILE__) . '/../ActionRegister.php';
+include_once dirname(__FILE__) . '/access/ViewAccessRight.php';
 
 /**
  * Class View
