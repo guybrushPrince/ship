@@ -4,7 +4,7 @@
  * Class Error
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
  */
-class Error extends CoastSerializable {
+class Error extends CliffSerializable {
 
     /**
      * The code of the error.
