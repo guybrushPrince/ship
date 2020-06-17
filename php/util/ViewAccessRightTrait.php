@@ -28,6 +28,24 @@
 		}
 
         /**
+         * Remove an access right.
+         * @param string $name
+         * @return bool
+         */
+        public function removeRight($name) {
+            $rights = $this->getRights();
+            $content = array();
+            if (!$rights) {
+                $content = array();
+            } else {
+                $content = simpleJsonDecode($rights);
+            }
+            $content = array_diff($content, array($name));
+            $this->setRights(simpleJsonEncode($content));
+            return true;
+        }
+
+        /**
          * Get a list of all rights.
          * @return array
          */

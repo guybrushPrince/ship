@@ -16,3 +16,11 @@ let delay = (function () {
         if (callback !== false) timer = setTimeout(callback, time);
     }
 })();
+
+let downloadFile = function(data, fileName) {
+    let blob = new Blob([data], {type: 'application/octet-binary'});
+    let link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+}

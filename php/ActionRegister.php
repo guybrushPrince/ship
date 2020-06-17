@@ -78,13 +78,29 @@ class ActionRegister {
 
                     $retValue = call_user_func_array($closure, $params);
 
-                    if (is_string($retValue)) {
+                    if (is_string($retValue) || is_string($retValue)) {
                         if (preg_match('/@CSV(.*)/', $method->getDocComment(), $matches) >= 1) {
                             $response = $this->app->response;
                             $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
                             $response->headers->set('Content-Disposition', 'attachment;filename=survey_data.csv');
                             $response->status(200);
                             $response->body($retValue);
+                        } else if (preg_match('/@PDF(.*)/', $method->getDocComment(), $matches) >= 1) {
+                            $response = $this->app->response;
+                            $response->headers->set('Content-Type', 'application/pdf');
+                            $response->status(200);
+                            $response->headers->set('Pragma', "public");
+                            $response->headers->set('Content-Transfer-Encoding', 'binary');
+                            $response->headers->set('Content-Length', filesize($retValue));
+                            $response->headers->set('Content-Description', 'File Transfer');
+                            $response->headers->set('Content-Type', 'application/octet-stream');
+                            $response->headers->set('Content-Type', 'application/force-download');
+                            $response->headers->set('Content-Disposition', 'attachment;filename=survey.pdf');
+                            // header('Content-Transfer-Encoding: binary');
+                            $response->headers->set('Expires', '0');
+                            $response->headers->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+                            //$response->body(file_get_contents($retValue));
+                            readfile($retValue);
                         } else {
                             $response = $this->app->response;
                             $response->headers->set('Content-Type', 'text/html; charset=utf-8');

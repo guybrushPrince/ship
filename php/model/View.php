@@ -282,6 +282,16 @@ abstract class View extends DirectView {
     }
 
     /**
+     * Do something with the current view.
+     * @param Closure $callback The callback.
+     * @return $this
+     */
+    public function self($callback) {
+        $callback($this);
+        return $this;
+    }
+
+    /**
      * Get the unique id.
      * @return string
      */

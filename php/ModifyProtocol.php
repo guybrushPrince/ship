@@ -198,10 +198,10 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Toggle classes from a view.
-     * @param DirectView|string $view The given view.
      * @param string|array $clazz The class(es) to toggle.
+     * @param DirectView|string|boolean $view The given view.
      */
-    public function toggleClass($view = null, $clazz) {
+    public function toggleClass($clazz, $view = false) {
         $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
@@ -282,6 +282,20 @@ abstract class ModifyProtocol extends Protocol {
         $this->protocol[] = array(
             "operation"  => "event",
             "event"      => $event,
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
+     * Sets the position of the view to the mouse position.
+     * @param DirectView|string $view The view.
+     * @return $this
+     */
+    public function mousePosition($view) {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation"  => "mousePosition",
             "view"      => $view
         );
         return $this;
