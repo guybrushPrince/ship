@@ -201,7 +201,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param string|array $clazz The class(es) to toggle.
      * @param DirectView|string|boolean $view The given view.
      */
-    public function toggleClass($clazz, $view = false) {
+    public function toggleClass($view, $clazz) {
         $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
