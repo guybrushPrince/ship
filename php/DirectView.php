@@ -13,6 +13,12 @@ abstract class DirectView {
     protected $references = array();
 
     /**
+     * A list of assigned names.
+     * @var array
+     */
+    protected $names = array();
+
+    /**
      * An array with protocols.
      * @var array
      */
@@ -54,7 +60,16 @@ abstract class DirectView {
             "view"  => ($view ? $view : $this),
             "scope" => $scope
         );
+        if (!$view) $this->names[] = $id;
         return $this;
+    }
+
+    /**
+     * Get the reference names of this view.
+     * @return array
+     */
+    public function getRefs() {
+        return $this->names;
     }
 
 }
