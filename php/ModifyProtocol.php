@@ -12,6 +12,8 @@ abstract class ModifyProtocol extends Protocol {
      */
     protected $actionImplementation;
 
+    public static $AS_IS = "AS_IS";
+
     /**
      * @inheritDoc
      */
@@ -78,14 +80,46 @@ abstract class ModifyProtocol extends Protocol {
     /**
      * Add the new to the given view.
      * @param DirectView|string $view The given view.
-     * @param DirectView|false $new The new view.
+     * @param DirectView|false|string $new The new view.
      */
     public function add($view, $new = false) {
         $view = $this->detectView($view);
-        $this->protocol[] = array(
+        $prot = array(
             "operation" => "add",
-            "view"      => $view,
-            "new"       => $new
+            "view"      => $view
+        );
+        if ($new !== ModifyProtocol::$AS_IS) $prot["new"] = $new;
+        $this->protocol[] = $prot;
+        return $this;
+    }
+
+    /**
+     * Change the text of a view.
+     * @param DirectView|string $view The given view.
+     * @param string|Closure|false $text The text.
+     */
+    public function text($view, $text = false) {
+        $view = $this->detectView($view);
+        $prot = array(
+            "operation" => "text",
+            "view"      => $view
+        );
+        if ($text) {
+            $prot["value"] = $text instanceof Closure ? $text() : $text;
+        }
+        $this->protocol[] = $prot;
+        return $this;
+    }
+
+    /**
+     * Change size to the contents size.
+     * @param DirectView|string $view The given view.
+     */
+    public function resize($view) {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "resize",
+            "view"      => $view
         );
         return $this;
     }
@@ -136,7 +170,7 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
-     * Add the new before the given view.
+     * Clear the view.
      * @param DirectView|string $view The given view.
      */
     public function clear($view) {
@@ -252,7 +286,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param string $name The function name.
      * @param array $parameters (optional) parameters
      * @param array $title (optional) Titles
-     * @return $this
+     * @return ActionProtocol
      */
     public function action($controller, $name, array $parameters = array(), array $title = array(
         Language::ENGLISH => 'New Task',

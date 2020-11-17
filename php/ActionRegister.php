@@ -143,14 +143,16 @@ class ActionRegister {
                 $response->headers->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
                 readfile($retValue);
             } else $this->setResponse($retValue, 'text/html');
-        } else if (is_array($retValue) || is_bool($retValue)) {
+        } else if (is_bool($retValue)) {
             $this->setResponse(simpleJsonEncode($retValue));
+        } else if (is_array($retValue)) {
+            $isViewsArray = count(array_filter($retValue, function($val) {
+                return !($val instanceof View);
+            })) === 0;
+            if ($isViewsArray) $this->setResponse($this->serializeView($retValue),  'text/html');
+            else $this->setResponse(simpleJsonEncode($retValue));
         } else if ($retValue instanceof View) {
-            if ($retValue instanceof HtmlView) {
-                $this->setResponse(
-                    $retValue->generate($this->shouldParsedCompletely($retValue)),
-                    'text/html');
-            }
+            $this->setResponse($this->serializeView($retValue),  'text/html');
         } else if ($retValue instanceof Error) {
             $this->setResponse(fullJsonEncode($retValue), 'application/json', 404);
         } else {
@@ -159,6 +161,20 @@ class ActionRegister {
         if (isset($_SESSION) && array_key_exists('rights', $_SESSION)) {
             unset($_SESSION["rights"]);
         }
+    }
+
+    /**
+     * A single or multiple views.
+     * @param View|array $views The view(s)
+     * @return string
+     */
+    private function serializeView($views) {
+        $views = is_array($views) ? $views : array($views);
+        return implode(array_map(function(View $view) {
+            if ($view instanceof HtmlView) {
+                return $view->generate($this->shouldParsedCompletely($view));
+            } else return '';
+        }, $views));
     }
 
     /**

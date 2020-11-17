@@ -27,7 +27,7 @@ abstract class DirectView {
     /**
      * Adds an action to the view.
      * @param integer $event The event.
-     * @return $this
+     * @return $this|ModifyProtocol
      */
     public abstract function protocol($event);
 
