@@ -125,6 +125,32 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Change the height to the contents size.
+     * @param DirectView|string $view The given view.
+     */
+    public function reheight($view) {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "reheight",
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
+     * Removes all element specific styles.
+     * @param DirectView|string $view The given view.
+     */
+    public function reset($view) {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "reset",
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
      * Add the new after the given view.
      * @param DirectView|string $view The given view.
      * @param DirectView|false $new The new view.
