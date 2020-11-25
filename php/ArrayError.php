@@ -4,7 +4,7 @@
  * Class ArrayError
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
  */
-class ArrayError extends Error {
+class ArrayError extends ShipError {
 
     /**
      * @var array

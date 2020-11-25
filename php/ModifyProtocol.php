@@ -432,7 +432,10 @@ abstract class ModifyProtocol extends Protocol {
         }
         if ($this->innerView() !== null) {
             $v = $view;
-            if (is_string($view)) $v = $this->innerView()->get($view)["view"];
+            if (is_string($view)) {
+                $v = $this->innerView()->get($view);
+                if ($v !== null) $v = $v["view"];
+            }
             if ($v !== null) $view = $v;
         }
         return $view;

@@ -4,7 +4,7 @@
  * Class Error
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
  */
-class Error extends CliffSerializable {
+class ShipError extends CliffSerializable {
 
     /**
      * The code of the error.

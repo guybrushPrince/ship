@@ -154,7 +154,7 @@ class ActionRegister {
             else $this->setResponse(simpleJsonEncode($retValue));
         } else if ($retValue instanceof View) {
             $this->setResponse($this->serializeView($retValue),  'text/html');
-        } else if ($retValue instanceof Error) {
+        } else if ($retValue instanceof ShipError) {
             $this->setResponse(fullJsonEncode($retValue), 'application/json', 404);
         } else {
             echo "ERROR";
