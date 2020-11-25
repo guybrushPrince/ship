@@ -56,6 +56,10 @@ abstract class ActionProtocol extends Protocol {
         $this->method = $method;
         $this->parameters = $parameters;
         $this->title = $title;
+        $this->templateObjects = array_filter($parameters, function($param) {
+            return ($param instanceof TemplateObject);
+        });
+        $this->findHiddenParameters();
     }
 
     /**
@@ -98,6 +102,19 @@ abstract class ActionProtocol extends Protocol {
             "protocol"  => $obj
     );
         return $obj;
+    }
+
+    private function findHiddenParameters() {
+        // Add hidden template objects
+        $clazz = new ReflectionClass($this->controller);
+        $method = $clazz->getMethod($this->method);
+        $hidden = array_filter($method->getParameters(), function(ReflectionParameter $param) {
+            return !array_key_exists($param->getName(), $this->parameters);
+        });
+        // Add a template object for each hidden
+        $this->templateObjects = array_merge($this->templateObjects, array_map(function(ReflectionParameter $param) {
+            return TemplateObject::_new($param->getName());
+        }, $hidden));
     }
 
 }

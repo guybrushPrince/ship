@@ -89,10 +89,12 @@ abstract class View extends DirectView {
 
     /**
      * Generates the code safe (with access).
+     * @param boolean $complete Whether with all information or not.
+     * @param boolean $templates Whether with templates or not.
      * @return string
      */
-    public function generateSafe($complete = false) {
-        if ($this->isSafe()) return $this->generate($complete);
+    public function generateSafe($complete = false, $templates = false) {
+        if ($this->isSafe()) return $this->generate($complete, $templates);
         else return '';
     }
 
@@ -124,9 +126,10 @@ abstract class View extends DirectView {
     /**
      * Generate code.
      * @param boolean $complete Whether with all information or not.
+     * @param boolean $templates Whether with templates or not.
      * @return string
      */
-    public abstract function generate($complete = false);
+    public abstract function generate($complete = false, $templates = false);
 
     /**
      * Set the language.

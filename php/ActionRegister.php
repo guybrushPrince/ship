@@ -107,6 +107,7 @@ class ActionRegister {
      * @return array
      */
     private function mapMethodParameters(ReflectionMethod $method, array $params) {
+        DebugLogger::instance()->debug($params);
         return array_map(function(ReflectionParameter $param) use ($params) {
             $name = $param->getName();
             $type = $param->getClass();
@@ -172,7 +173,7 @@ class ActionRegister {
         $views = is_array($views) ? $views : array($views);
         return implode(array_map(function(View $view) {
             if ($view instanceof HtmlView) {
-                return $view->generate($this->shouldParsedCompletely($view));
+                return $view->generate($this->shouldParsedCompletely($view), true);
             } else return '';
         }, $views));
     }

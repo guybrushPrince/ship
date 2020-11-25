@@ -38,10 +38,15 @@ abstract class ModifyProtocol extends Protocol {
      * Set a value in the context.
      * @param string $var The name of the variable
      * @param bool|string|object $new The value.
+     * @param string $scope The scope.
      * @return $this
      */
     public function set($var, $new = false, $scope = false) {
-        $new = $this->detectView($new);
+        if ($new instanceof TemplateObject) {
+            $new->setIsView(true);
+            $this->addTemplateObject($new);
+        }
+        else $new = $this->detectView($new);
         $this->protocol[] = array(
             "operation" => "set",
             "key"       => $var,
@@ -83,6 +88,10 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false|string $new The new view.
      */
     public function add($view, $new = false) {
+        if ($new instanceof TemplateObject) {
+            $new->setIsView(true);
+            $this->addTemplateObject($new);
+        }
         $view = $this->detectView($view);
         $prot = array(
             "operation" => "add",
@@ -156,6 +165,10 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false $new The new view.
      */
     public function after($view, $new = false) {
+        if ($new instanceof TemplateObject) {
+            $new->setIsView(true);
+            $this->addTemplateObject($new);
+        }
         $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "after",
@@ -171,6 +184,10 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false $new The new view.
      */
     public function before($view, $new = false) {
+        if ($new instanceof TemplateObject) {
+            $new->setIsView(true);
+            $this->addTemplateObject($new);
+        }
         $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "before",
@@ -186,6 +203,10 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|false $new The new view.
      */
     public function replace($view, $new = false) {
+        if ($new instanceof TemplateObject) {
+            $new->setIsView(true);
+            $this->addTemplateObject($new);
+        }
         $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "replace",
@@ -356,27 +377,28 @@ abstract class ModifyProtocol extends Protocol {
         $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation"  => "mousePosition",
-            "view"      => $view
+            "view"       => $view
         );
         return $this;
     }
 
     /**
-     * For each element of an array.
-     * @param array $array The array.
-     * @param Closure $function The closure.
-     * @return $this
+     * Call a template.
+     * @param string $name The name of the template.
+     * @param array $context A mapping from the template objects to real objects.
+     * @param string $environment The environment.
      */
-    /*public function each(array $array = array(), Closure $function) {
-        $obj = new HtmlModifyProtocol($this->innerView());
+    public function doIt($name, $context = array(), $environment = 'global') {
         $this->protocol[] = array(
-            "operation"  => "each",
-            "protocol"   => $obj,
-            "array"      => $array,
-            "function"    => $function
+            "operation"   => "doIt",
+            "entry"       => $this->innerView(),
+            "name"        => $name,
+            "context"     => $context,
+            "environment" => $environment,
+            "protocol"    => TemplateProtocol::get($name, $environment)
         );
         return $this;
-    }*/
+    }
 
     /**
      * Detects the view if the view is a string or returns the string itself.
@@ -384,6 +406,11 @@ abstract class ModifyProtocol extends Protocol {
      * @return string|array|DirectView
      */
     protected function detectView($view) {
+        if ($view instanceof TemplateObject) {
+            $view->setIsView(true);
+            $this->addTemplateObject($view);
+            return $view;
+        }
         if ($view === null) return $this->innerView();
         if (is_array($view)) {
             $view = array_map(function($v) { return $this->detectSingleView($v); }, $view);
@@ -399,6 +426,10 @@ abstract class ModifyProtocol extends Protocol {
      * @return string|DirectView
      */
     private function detectSingleView($view) {
+        if ($view instanceof TemplateObject) {
+            $this->addTemplateObject($view);
+            return $view;
+        }
         if ($this->innerView() !== null) {
             $v = $view;
             if (is_string($view)) $v = $this->innerView()->get($view)["view"];
