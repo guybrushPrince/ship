@@ -24,12 +24,17 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Append the modifiy protocol with another.
-     * @param ModifyProtocol|boolean $protocol The protocol.
+     * @param ModifyProtocol|TemplateObject|false $protocol The protocol.
      */
     public function append($protocol) {
-        if ($protocol) {
+        if ($protocol instanceof Protocol) {
             $protocol->setParent($this->parent);
             $this->protocol = array_merge($this->protocol, $protocol->protocol);
+        } else if ($protocol instanceof TemplateObject) {
+            $this->protocol[] = array(
+                "operation" => "virtualDoIt",
+                "protocol"  => $protocol
+            );
         }
         return $this;
     }
