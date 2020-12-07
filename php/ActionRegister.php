@@ -1,6 +1,9 @@
 <?php
 
 include_once dirname(__FILE__) . '/../../yarn/CoastSerializableFunctions.php';
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 
 /**
  * Class ActionRegister
@@ -10,7 +13,7 @@ class ActionRegister {
 
     /**
      * The API handler
-     * @var \Slim\Slim
+     * @var RouteCollectorProxy
      */
     private $app = null;
 
@@ -28,10 +31,10 @@ class ActionRegister {
 
     /**
      * Create or get the singleton action protocol instance.
-     * @param \Slim\Slim $app
+     * @param RouteCollectorProxy $app
      * @return ActionRegister
      */
-    public static function instance(\Slim\Slim $app = null) {
+    public static function instance(RouteCollectorProxy $app = null) {
         if (!ActionRegister::$singleton) {
             ActionRegister::$singleton = new ActionRegister($app);
         } else {
@@ -44,9 +47,9 @@ class ActionRegister {
 
     /**
      * ActionProtocol constructor.
-     * @param \Slim\Slim $app The slim app.
+     * @param RouteCollectorProxy $app The slim app.
      */
-    private function __construct(\Slim\Slim $app = null) {
+    private function __construct(RouteCollectorProxy $app = null) {
         $this->app = $app;
     }
 
@@ -62,14 +65,16 @@ class ActionRegister {
             if ($this->app) {
                 foreach ($clazz->getMethods() as $method) {
                     // Create a service function that maps parameters and handles the output.
-                    $fun = function ($user = false, $group = false) use ($obj, $method) {
+                    $fun = function (Request $request, Response $response, array $args) use ($obj, $method) {
+                        $user = array_key_exists('user', $args) ? $args['user'] : false;
+                        $group = array_key_exists('group', $args) ? $args['group'] : false;
                         $closure = $method->getClosure($obj);
 
                         // Get the json object with all information
                         if ($this->hasURLParameters($method)) {
-                            $params = $this->app->request()->params();
+                            $params = $request->getQueryParams();
                         } else {
-                            $json = $this->app->request()->getBody();
+                            $json = $request->getBody();
                             $params = simpleJsonDecode($json);
                         }
                         if (is_null($params) || $params === '') $params = array();
@@ -79,7 +84,9 @@ class ActionRegister {
                         // Invoke the function.
                         $retValue = call_user_func_array($closure, $params);
                         // Handle the method output
-                        $this->handleMethodOutput($method, $retValue);
+                        $this->handleMethodOutput($response, $method, $retValue);
+
+                        return $response;
                     };
 
                     // Register the service function as REST service
@@ -89,9 +96,11 @@ class ActionRegister {
                     if ($isGet && $isGet >= 0) {
                         $this->app->get('/api/' . $method->getName(), $fun);
                     } else if ($isGetParameters) {
-                        $this->app->get('/:user/:group/api/' . $method->getName(), $fun);
+                        $route = $this->app->get('/{user}/{group}/api/' . $method->getName(), $fun);
+                        $route->add(TwilightMiddleware::class);
                     } else if (!$without) {
-                        $this->app->post('/:user/:group/api/' . $method->getName(), $fun);
+                        $route = $this->app->post('/{user}/{group}/api/' . $method->getName(), $fun);
+                        $route->add(TwilightMiddleware::class);
                     } else {
                         $this->app->post('/api/' . $method->getName(), $fun);
                     }
@@ -123,39 +132,40 @@ class ActionRegister {
 
     /**
      * Handle the output of the method.
-     * @param ReflectionMethod $method
-     * @param $retValue
+     * @param Response $response The response.
+     * @param ReflectionMethod $method The method.
+     * @param string|bool|array|View|ShipError $retValue
      */
-    private function handleMethodOutput(ReflectionMethod $method, $retValue) {
+    private function handleMethodOutput(Response $response, ReflectionMethod $method, $retValue) {
         if (is_string($retValue) || is_string($retValue)) {
             if ($this->isCSV($method)) {
-                $response = $this->setResponse($retValue, 'text/csv');
-                $response->headers->set('Content-Disposition', 'attachment;filename=survey_data.csv');
+                $response = $this->setResponse($response, $retValue, 'text/csv');
+                $response->withHeader('Content-Disposition', 'attachment;filename=survey_data.csv');
             } else if ($this->isPDF($method)) {
-                $response = $this->setResponse(null, 'application/pdf');
-                $response->headers->set('Pragma', "public");
-                $response->headers->set('Content-Transfer-Encoding', 'binary');
-                $response->headers->set('Content-Length', filesize($retValue));
-                $response->headers->set('Content-Description', 'File Transfer');
-                $response->headers->set('Content-Type', 'application/octet-stream');
-                $response->headers->set('Content-Type', 'application/force-download');
-                $response->headers->set('Content-Disposition', 'attachment;filename=survey.pdf');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+                $response = $this->setResponse($response, null, 'application/pdf');
+                $response->withHeader('Pragma', "public");
+                $response->withHeader('Content-Transfer-Encoding', 'binary');
+                $response->withHeader('Content-Length', filesize($retValue));
+                $response->withHeader('Content-Description', 'File Transfer');
+                $response->withHeader('Content-Type', 'application/octet-stream');
+                $response->withHeader('Content-Type', 'application/force-download');
+                $response->withHeader('Content-Disposition', 'attachment;filename=survey.pdf');
+                $response->withHeader('Expires', '0');
+                $response->withHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
                 readfile($retValue);
-            } else $this->setResponse($retValue, 'text/html');
+            } else $this->setResponse($response, $retValue, 'text/html');
         } else if (is_bool($retValue)) {
-            $this->setResponse(simpleJsonEncode($retValue));
+            $this->setResponse($response, simpleJsonEncode($retValue));
         } else if (is_array($retValue)) {
             $isViewsArray = count(array_filter($retValue, function($val) {
                 return !($val instanceof View);
             })) === 0;
-            if ($isViewsArray) $this->setResponse($this->serializeView($retValue),  'text/html');
-            else $this->setResponse(simpleJsonEncode($retValue));
+            if ($isViewsArray) $this->setResponse($response, $this->serializeView($retValue),  'text/html');
+            else $this->setResponse($response, simpleJsonEncode($retValue));
         } else if ($retValue instanceof View) {
-            $this->setResponse($this->serializeView($retValue),  'text/html');
+            $this->setResponse($response, $this->serializeView($retValue),  'text/html');
         } else if ($retValue instanceof ShipError) {
-            $this->setResponse(fullJsonEncode($retValue), 'application/json', 404);
+            $this->setResponse($response, fullJsonEncode($retValue), 'application/json', 404);
         } else {
             echo "ERROR";
         }
@@ -199,16 +209,19 @@ class ActionRegister {
 
     /**
      * Set the response.
+     * @param Response $response The response.
      * @param string $body The content.
      * @param string $contentType The content type.
      * @param int $status The status of the response.
-     * @return \Slim\Http\Response
+     * @return Response
      */
-    private function setResponse($body, $contentType = 'application/json', $status = 200) {
-        $response = $this->app->response;
-        $response->headers->set('Content-Type', $contentType . '; charset=utf-8');
-        $response->status($status);
-        if ($body !== null) $response->body($body);
+    private function setResponse(Response $response, $body, $contentType = 'application/json', $status = 200) {
+        $response->withHeader('Content-Type', $contentType . '; charset=utf-8');
+        $response->withStatus($status);
+        if ($body !== null) {
+            $b = $response->getBody();
+            $b->write($body);
+        }
         return $response;
     }
 
