@@ -84,7 +84,7 @@ class ActionRegister {
                         // Invoke the function.
                         $retValue = call_user_func_array($closure, $params);
                         // Handle the method output
-                        $this->handleMethodOutput($response, $method, $retValue);
+                        $response = $this->handleMethodOutput($response, $method, $retValue);
 
                         return $response;
                     };
@@ -135,23 +135,24 @@ class ActionRegister {
      * @param Response $response The response.
      * @param ReflectionMethod $method The method.
      * @param string|bool|array|View|ShipError $retValue
+     * @return Response
      */
     private function handleMethodOutput(Response $response, ReflectionMethod $method, $retValue) {
         if (is_string($retValue) || is_string($retValue)) {
             if ($this->isCSV($method)) {
                 $response = $this->setResponse($response, $retValue, 'text/csv');
-                $response->withHeader('Content-Disposition', 'attachment;filename=survey_data.csv');
+                $response = $response->withHeader('Content-Disposition', 'attachment;filename=survey_data.csv');
             } else if ($this->isPDF($method)) {
                 $response = $this->setResponse($response, null, 'application/pdf');
-                $response->withHeader('Pragma', "public");
-                $response->withHeader('Content-Transfer-Encoding', 'binary');
-                $response->withHeader('Content-Length', filesize($retValue));
-                $response->withHeader('Content-Description', 'File Transfer');
-                $response->withHeader('Content-Type', 'application/octet-stream');
-                $response->withHeader('Content-Type', 'application/force-download');
-                $response->withHeader('Content-Disposition', 'attachment;filename=survey.pdf');
-                $response->withHeader('Expires', '0');
-                $response->withHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+                $response = $response->withHeader('Pragma', "public")
+                                     ->withHeader('Content-Transfer-Encoding', 'binary')
+                                     ->withHeader('Content-Length', filesize($retValue))
+                                     ->withHeader('Content-Description', 'File Transfer')
+                                     ->withHeader('Content-Type', 'application/octet-stream')
+                                     ->withHeader('Content-Type', 'application/force-download')
+                                     ->withHeader('Content-Disposition', 'attachment;filename=survey.pdf')
+                                     ->withHeader('Expires', '0')
+                                     ->withHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
                 readfile($retValue);
             } else $this->setResponse($response, $retValue, 'text/html');
         } else if (is_bool($retValue)) {
@@ -172,6 +173,7 @@ class ActionRegister {
         if (isset($_SESSION) && array_key_exists('rights', $_SESSION)) {
             unset($_SESSION["rights"]);
         }
+        return $response;
     }
 
     /**
@@ -216,12 +218,9 @@ class ActionRegister {
      * @return Response
      */
     private function setResponse(Response $response, $body, $contentType = 'application/json', $status = 200) {
-        $response->withHeader('Content-Type', $contentType . '; charset=utf-8');
-        $response->withStatus($status);
-        if ($body !== null) {
-            $b = $response->getBody();
-            $b->write($body);
-        }
+        $response = $response->withHeader('Content-Type', $contentType . '; charset=utf-8')
+                             ->withStatus($status);
+        if ($body !== null) $response->getBody()->write($body);
         return $response;
     }
 
