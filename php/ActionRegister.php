@@ -123,11 +123,30 @@ class ActionRegister {
             if ($type !== null && !Tools::isScalar($type->name)) {
                 $class = $type->name;
                 $keyBinding = $class::getKeyBinding();
+                $key = self::deConvertKey($params[$name]);
                 return call_user_func($type->name . '::get',
-                    ($keyBinding === 'i' ? intval($params[$name]) : $params[$name])
+                    ($keyBinding === 'i' ? intval($key) : $key)
                 );
             } else return $params[$name];
         }, $method->getParameters());
+    }
+
+    /**
+     * Convert the key
+     * @param string|integer $value The value/key.
+     * @return string
+     */
+    public static function convertKey($value) : string {
+        return base_convert($value, 10, 36);
+    }
+
+    /**
+     * Deconvert the key.
+     * @param string|integer $value The value/key.
+     * @return string
+     */
+    public static function deConvertKey($value) : string {
+        return base_convert($value, 36, 10);
     }
 
     /**
