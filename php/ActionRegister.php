@@ -123,7 +123,7 @@ class ActionRegister {
             if ($type !== null && !Tools::isScalar($type->name)) {
                 $class = $type->name;
                 $keyBinding = $class::getKeyBinding();
-                $key = self::deConvertKey($params[$name]);
+                $key = ($keyBinding === 'i' ? self::deConvertKey($params[$name]) : $params[$name]);
                 return call_user_func($type->name . '::get',
                     ($keyBinding === 'i' ? intval($key) : $key)
                 );
