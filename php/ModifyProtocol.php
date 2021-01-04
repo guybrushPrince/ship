@@ -139,6 +139,19 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Try to set focus on the element.
+     * @param DirectView|string $view The given view.
+     */
+    public function focus($view) {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "focus",
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
      * Change the height to the contents size.
      * @param DirectView|string $view The given view.
      */

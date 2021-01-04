@@ -122,9 +122,12 @@ class ActionRegister {
             $type = $param->getClass();
             if ($type !== null && !Tools::isScalar($type->name)) {
                 $class = $type->name;
+                if (array_key_exists($name . 'IClass', $params)) {
+                    $class = $params[$name . 'IClass'];
+                }
                 $keyBinding = $class::getKeyBinding();
                 $key = ($keyBinding === 'i' ? self::deConvertKey($params[$name]) : $params[$name]);
-                return call_user_func($type->name . '::get',
+                return call_user_func($class . '::get',
                     ($keyBinding === 'i' ? intval($key) : $key)
                 );
             } else return $params[$name];
@@ -133,7 +136,7 @@ class ActionRegister {
 
     /**
      * Convert the key
-     * @param string|integer $value The value/key.
+     * @param string|integer $value The value / key.
      * @return string
      */
     public static function convertKey($value) : string {
@@ -142,7 +145,7 @@ class ActionRegister {
 
     /**
      * Deconvert the key.
-     * @param string|integer $value The value/key.
+     * @param string|integer $value The value / key.
      * @return string
      */
     public static function deConvertKey($value) : string {
