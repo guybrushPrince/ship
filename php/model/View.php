@@ -72,6 +72,7 @@ abstract class View extends DirectView {
     /**
      * The view.
      * @param View $view
+     * @return View
      */
     public function add(View $view) {
         $this->subviews[] = $view;
