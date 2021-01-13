@@ -149,7 +149,10 @@ abstract class TemplateProtocol extends Protocol {
      * @return mixed
      */
     public static function get($name, $environment = 'global') {
-        return TemplateProtocol::$templates[TemplateProtocol::getCallNameFunc($name, $environment)];
+        $callName = TemplateProtocol::getCallNameFunc($name, $environment);
+        if (!array_key_exists($callName, TemplateProtocol::$templates))
+            DebugLogger::instance()->debug($callName, array_keys(TemplateProtocol::$templates));
+        return TemplateProtocol::$templates[$callName];
     }
 }
 ?>
