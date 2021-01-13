@@ -40,6 +40,12 @@ abstract class ActionProtocol extends Protocol {
     protected $title;
 
     /**
+     * Whether it should use sea star or not.
+     * @var bool|int
+     */
+    protected $seaStar = false;
+
+    /**
      * @inheritDoc
      */
     public function __construct(
@@ -48,7 +54,8 @@ abstract class ActionProtocol extends Protocol {
         $method,
         $implementation,
         $parameters = array(),
-        $title = array()
+        $title = array(),
+        $seaStar = false
     ) {
         parent::__construct($parent);
         $this->implementation = $implementation;
@@ -56,6 +63,7 @@ abstract class ActionProtocol extends Protocol {
         $this->method = $method;
         $this->parameters = $parameters;
         $this->title = $title;
+        $this->seaStar = $seaStar;
         $this->templateObjects = array_filter($parameters, function($param) {
             return ($param instanceof TemplateObject);
         });
@@ -105,16 +113,18 @@ abstract class ActionProtocol extends Protocol {
     }
 
     private function findHiddenParameters() {
-        // Add hidden template objects
-        $clazz = new ReflectionClass($this->controller);
-        $method = $clazz->getMethod($this->method);
-        $hidden = array_filter($method->getParameters(), function(ReflectionParameter $param) {
-            return !array_key_exists($param->getName(), $this->parameters);
-        });
-        // Add a template object for each hidden
-        $this->templateObjects = array_merge($this->templateObjects, array_map(function(ReflectionParameter $param) {
-            return TemplateObject::_new($param->getName());
-        }, $hidden));
+        if ($this->seaStar !== SeaStarMethod::EVENT) {
+            // Add hidden template objects
+            $clazz = new ReflectionClass($this->controller);
+            $method = $clazz->getMethod($this->method);
+            $hidden = array_filter($method->getParameters(), function (ReflectionParameter $param) {
+                return !array_key_exists($param->getName(), $this->parameters);
+            });
+            // Add a template object for each hidden
+            $this->templateObjects = array_merge($this->templateObjects, array_map(function (ReflectionParameter $param) {
+                return TemplateObject::_new($param->getName());
+            }, $hidden));
+        }
     }
 
 }

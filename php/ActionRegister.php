@@ -80,7 +80,7 @@ class ActionRegister {
                         if (is_null($params) || $params === '') $params = array();
                         DebugLogger::instance()->debug('Call', $method->getName(), 'with params', $params);
                         // Replace parameters in the method call which are objects.
-                        $params = $this->mapMethodParameters($method, $params);
+                        $params = self::mapMethodParameters($method, $params);
                         // Invoke the function.
                         $retValue = call_user_func_array($closure, $params);
                         // Handle the method output
@@ -113,14 +113,14 @@ class ActionRegister {
      * Maps parameters to the parameters of the method.
      * @param ReflectionMethod $method The method.
      * @param array $params The parameters.
+     * @param array $ignore Classes to ignore.
      * @return array
      */
-    private function mapMethodParameters(ReflectionMethod $method, array $params) {
-        DebugLogger::instance()->debug($params);
-        return array_map(function(ReflectionParameter $param) use ($params) {
+    public static function mapMethodParameters(ReflectionMethod $method, array $params, array $ignore = []): array {
+        return array_map(function(ReflectionParameter $param) use ($params, $ignore) {
             $name = $param->getName();
             $type = $param->getClass();
-            if ($type !== null && !Tools::isScalar($type->name)) {
+            if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
                 $class = $type->name;
                 if (array_key_exists($name . 'IClass', $params)) {
                     $class = $params[$name . 'IClass'];

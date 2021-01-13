@@ -351,21 +351,23 @@ abstract class ModifyProtocol extends Protocol {
      * @param string $name The function name.
      * @param array $parameters (optional) parameters
      * @param array $title (optional) Titles
+     * @param bool|int $seaStar (optional) Whether it should use sea star.
      * @return ActionProtocol
      */
     public function action($controller, $name, array $parameters = array(), array $title = array(
         Language::ENGLISH => 'New Task',
         Language::GERMAN => 'Neue Aktion'
-    )) {
+    ), $seaStar = false) {
         $impl = $this->actionImplementation;
-        $obj = new $impl($this, $controller, $name, $parameters, $title);
+        $obj = new $impl($this, $controller, $name, $parameters, $title, $seaStar);
         $this->protocol[] = array(
             "operation"  => "action",
             "controller" => $controller,
             "method"     => $name,
             "protocol"   => $obj,
             "parameters" => $parameters,
-            "title"      => $title
+            "title"      => $title,
+            "seaStar"    => $seaStar
         );
         return $obj;
     }
