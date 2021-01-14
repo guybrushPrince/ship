@@ -13,9 +13,9 @@ class ActionRegister {
 
     /**
      * The API handler
-     * @var RouteCollectorProxy
+     * @var RouteCollectorProxy|null
      */
-    private $app = null;
+    private ?RouteCollectorProxy $app = null;
 
     /**
      * The only instance.
@@ -27,11 +27,11 @@ class ActionRegister {
      * A list of View classes that should not be exported completely.
      * @var array
      */
-    private $notComplete = array();
+    private array $notComplete = array();
 
     /**
      * Create or get the singleton action protocol instance.
-     * @param RouteCollectorProxy $app
+     * @param RouteCollectorProxy|null $app
      * @return ActionRegister
      */
     public static function instance(RouteCollectorProxy $app = null) {
@@ -47,15 +47,27 @@ class ActionRegister {
 
     /**
      * ActionProtocol constructor.
-     * @param RouteCollectorProxy $app The slim app.
+     * @param RouteCollectorProxy|null $app The slim app.
      */
     private function __construct(RouteCollectorProxy $app = null) {
         $this->app = $app;
     }
 
     /**
+     * Binds the events to the action register.
+     * @param string[]|string $events
+     */
+    public function bindEvents($events) {
+        $events = is_array($events) ? $events : [$events];
+        foreach ($events as $event) {
+            $event::add();
+        }
+    }
+
+    /**
      * Register a controller.
-     * @param array|string $className The class name of the controller.
+     * @param array|string $classNames The class name of the controller.
+     * @throws ReflectionException
      */
     public function register($classNames) {
         if (!is_array($classNames)) $classNames = array($classNames);
@@ -159,7 +171,7 @@ class ActionRegister {
      * @param string|bool|array|View|ShipError $retValue
      * @return Response
      */
-    private function handleMethodOutput(Response $response, ReflectionMethod $method, $retValue) {
+    private function handleMethodOutput(Response $response, ReflectionMethod $method, $retValue) : Response {
         if (is_string($retValue) || is_string($retValue)) {
             if ($this->isCSV($method)) {
                 $response = $this->setResponse($response, $retValue, 'text/csv');
@@ -203,7 +215,7 @@ class ActionRegister {
      * @param View|array $views The view(s)
      * @return string
      */
-    private function serializeView($views) {
+    private function serializeView($views): string {
         $views = is_array($views) ? $views : array($views);
         return implode(array_map(function(View $view) {
             if ($view instanceof HtmlView) {
@@ -216,7 +228,7 @@ class ActionRegister {
      * Adds a view class that should not be parsed.
      * @param string $clazz The class.
      */
-    public function parseNotCompletely($clazz) {
+    public function parseNotCompletely(string $clazz) {
         $this->notComplete[] = $clazz;
     }
 
@@ -225,7 +237,7 @@ class ActionRegister {
      * @param View $view The view.
      * @return boolean
      */
-    private function shouldParsedCompletely(View $view) {
+    private function shouldParsedCompletely(View $view): bool {
         return count(array_filter($this->notComplete, function($clazz) use ($view) {
             return $view instanceof $clazz;
         })) === 0;
