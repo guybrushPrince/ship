@@ -246,12 +246,14 @@ abstract class View extends DirectView {
     /**
      * @see View->addHint
      * @param int $language The language.
-     * @param string $hint The hint.
-     * @return $this
+     * @param string|false $hint The hint.
+     * @return $this|string[]
      */
-    public function hint($language, $hint) {
-        $this->addHint($language, $hint);
-        return $this;
+    public function hint($language, $hint = false) {
+        if ($hint) {
+            $this->addHint($language, $hint);
+            return $this;
+        } else return $this->hints[$language];
     }
 
     /**
