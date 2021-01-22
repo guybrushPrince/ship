@@ -88,7 +88,6 @@ abstract class TemplateProtocol extends Protocol {
      * @return string
      */
     public function listener() {
-        DebugLogger::instance()->debug('Create listener for', $this->getCallName());
         if (!$this->delivered) {
             $this->delivered = true;
             return $this->createListener();
