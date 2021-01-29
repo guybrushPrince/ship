@@ -118,7 +118,6 @@ abstract class TemplateProtocol extends Protocol {
      * @return string
      */
     public static function generateAll(array &$context = array()) {
-        DebugLogger::instance()->debug($context);
         return implode('', array_map(function(TemplateProtocol $protocol) use (&$context) {
             if (!in_array($protocol->getCallName(), $context)) {
                 $context[] = $protocol->getCallName();

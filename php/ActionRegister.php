@@ -90,7 +90,6 @@ class ActionRegister {
                             $params = simpleJsonDecode($json);
                         }
                         if (is_null($params) || $params === '') $params = array();
-                        DebugLogger::instance()->debug('Call', $method->getName(), 'with params', $params);
                         // Replace parameters in the method call which are objects.
                         $params = self::mapMethodParameters($method, $params);
                         // Invoke the function.
