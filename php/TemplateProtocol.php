@@ -70,7 +70,7 @@ abstract class TemplateProtocol extends Protocol {
     /**
      * @inheritDoc
      */
-    public function generate($context = array(), $entryView = null) {
+    public function generate($context = array(), $entryView = null) : string {
         $this->inUse = true;
         return $this->createThrower($context, $entryView);
     }
@@ -78,10 +78,10 @@ abstract class TemplateProtocol extends Protocol {
     /**
      * Create the code to throw the event / template.
      * @param array $context The calling context.
-     * @param DirectView $entryView The entry / context view.
+     * @param DirectView|Protocol $entryView The entry / context view.
      * @return string
      */
-    public abstract function createThrower(array $context = array(), DirectView $entryView = null);
+    public abstract function createThrower(array $context = array(), $entryView = null) : string;
 
     /**
      * Create code for the template (alias the function).

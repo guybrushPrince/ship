@@ -96,7 +96,6 @@ class ActionRegister {
                         $retValue = call_user_func_array($closure, $params);
                         // Handle the method output
                         $response = $this->handleMethodOutput($response, $method, $retValue);
-
                         return $response;
                     };
 

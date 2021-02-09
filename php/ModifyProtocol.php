@@ -411,7 +411,7 @@ abstract class ModifyProtocol extends Protocol {
     public function doIt($name, $context = array(), $environment = 'global') {
         $this->protocol[] = array(
             "operation"   => "doIt",
-            "entry"       => $this->innerView(),
+            /*"entry"       => $this,*/
             "name"        => $name,
             "context"     => $context,
             "environment" => $environment,

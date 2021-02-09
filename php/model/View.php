@@ -183,6 +183,7 @@ abstract class View extends DirectView {
      */
     public function get($id, $lastChance = false) {
         $view = parent::get($id);
+        if ($view) return $view;
         if ($view === null && $this->parent !== null) {
             return $this->parent->get($id, $lastChance);
         } else {

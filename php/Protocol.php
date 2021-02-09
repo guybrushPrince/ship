@@ -49,10 +49,9 @@ abstract class Protocol {
 
     /**
      * Generates the code for the protocol.
-     * @param array|false $context The context.
      * @return string
      */
-    public abstract function generate(/*$context = false*/);
+    public abstract function generate(): string;
 
     /**
      * Set the parent.
