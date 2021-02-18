@@ -55,12 +55,12 @@ class TextView extends View {
     /**
      * @inheritDoc
      */
-    public function protocol($event, $delay = false) {
+    public function protocol(int $event, array $params = []) {
         if ($this->parent() instanceof HtmlView) {
-            $prot = new HtmlEventProtocol($event, $this, $delay);
-            $this->protocols[] = $prot;
-            $prot = $prot->modify();
-            return $prot;
+            $pro = new HtmlEventProtocol($event, $this, $params);
+            $this->protocols[] = $pro;
+            $pro = $pro->modify();
+            return $pro;
         } else {
             return null;
         }

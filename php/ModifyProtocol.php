@@ -329,14 +329,16 @@ abstract class ModifyProtocol extends Protocol {
      * Throw an event on the view.
      * @param integer $event The event.
      * @param DirectView|string $view The view.
+     * @param array|false $data Some additional data.
      * @return $this
      */
-    public function throwevent($event, $view) {
+    public function throwevent($event, $view, $data = false) {
         $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation" => "throw",
             "event"     => $event,
-            "view"      => $view
+            "view"      => $view,
+            "data"      => $data
         );
         return $this;
     }
