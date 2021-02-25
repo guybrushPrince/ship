@@ -13,33 +13,27 @@ abstract class View extends DirectView {
 
     /**
      * An array of subviews.
-     * @var array: View
+     * @var View[]
      */
-    protected $subviews = array();
+    protected array $subviews = array();
 
     /**
      * The current language.
      * @var integer
      */
-    protected static $language = Language::GERMAN;
-
-    /**
-     * An id counter.
-     * @var integer
-     */
-    //protected static $idCounter = 1;
+    protected static int $language = Language::GERMAN;
 
     /**
      * The parent view of this view.
-     * @var View
+     * @var ?View
      */
-    protected $parent = null;
+    protected ?View $parent = null;
 
     /**
      * An array of hints.
      * @var array
      */
-    protected $hints = array();
+    protected array $hints = array();
 
     /**
      * The unique id of the view.
@@ -51,20 +45,18 @@ abstract class View extends DirectView {
      * Which access must be granted.
      * @var array
      */
-    protected $access = array();
+    protected array $access = array();
 
     /**
      * View constructor.
      */
-    public function __construct() {
-        //$this->uniqueId = $this->generateId();
-    }
+    public function __construct() { }
 
     /**
      * Generates a unique id.
      * @return bool|string
      */
-    protected function generateId() {
+    protected function generateId() : string {
         return base_convert(rand(), 10, 36);
     }
 
@@ -74,7 +66,7 @@ abstract class View extends DirectView {
      * @param View $view
      * @return View
      */
-    public function add(View $view) {
+    public function add(View $view) : View {
         $this->subviews[] = $view;
         $view->parent = $this;
         return $view;
@@ -83,7 +75,7 @@ abstract class View extends DirectView {
     /**
      * @inheritDoc
      */
-    public function access($access) {
+    public function access($access) : View {
         $this->access = (is_array($access) ? $access : array( $access ));
         return $this;
     }
@@ -94,16 +86,16 @@ abstract class View extends DirectView {
      * @param boolean $templates Whether with templates or not.
      * @return string
      */
-    public function generateSafe($complete = false, $templates = false) {
+    public function generateSafe($complete = false, $templates = false) : string {
         if ($this->isSafe()) return $this->generate($complete, $templates);
         else return '';
     }
 
     /**
      * Checks whether it is safe or not.
-     * @return string
+     * @return bool
      */
-    protected function isSafe() {
+    protected function isSafe() : bool {
         if (count($this->access) === 0) return true;
         if (isset($_SESSION) &&
             array_key_exists('group', $_SESSION) &&
@@ -130,7 +122,7 @@ abstract class View extends DirectView {
      * @param boolean $templates Whether with templates or not.
      * @return string
      */
-    public abstract function generate($complete = false, $templates = false);
+    public abstract function generate($complete = false, $templates = false) : string;
 
     /**
      * Set the language.
@@ -143,23 +135,23 @@ abstract class View extends DirectView {
     /**
      * Get the language.
      */
-    public static function getLanguage() {
-        return View::$language;
+    public static function getLanguage() : int {
+        return self::$language;
     }
 
     /**
      * Get the parent view.
-     * @return View
+     * @return ?View
      */
-    public function getParent() {
+    public function getParent() : ?View {
         return $this->parent;
     }
 
     /**
      * Determine the uppermost parent view.
-     * @return View
+     * @return ?View
      */
-    public function getRoot() {
+    public function getRoot() : ?View {
         $parent = $this->parent;
         if ($parent === null) return $this;
         while ($parent->getParent() !== null) {
@@ -173,7 +165,7 @@ abstract class View extends DirectView {
      * @param int $language The language.
      * @param string $hint The hint.
      */
-    public function addHint($language, $hint) {
+    public function addHint(int $language, string $hint) {
         if (!array_key_exists($language, $this->hints)) $this->hints[$language] = array();
         $this->hints[$language][] = $hint;
     }
@@ -222,25 +214,25 @@ abstract class View extends DirectView {
 
     /**
      * Get the subviews.
-     * @return array
+     * @return View[]
      */
-    public function views() {
+    public function views() : array {
         return $this->subviews;
     }
 
     /**
      * Get the parent view.
-     * @return View
+     * @return ?View
      */
-    public function parent() {
+    public function parent() : ?View {
         return $this->getParent();
     }
 
     /**
      * @see View->getRoot
-     * @return View
+     * @return ?View
      */
-    public function root() {
+    public function root() : ?View {
         return $this->getRoot();
     }
 
@@ -250,7 +242,7 @@ abstract class View extends DirectView {
      * @param string|false $hint The hint.
      * @return $this|string[]
      */
-    public function hint($language, $hint = false) {
+    public function hint(int $language, $hint = false) {
         if ($hint) {
             $this->addHint($language, $hint);
             return $this;
@@ -263,7 +255,7 @@ abstract class View extends DirectView {
      * @param Closure $callback The callback function of type (View, Element, Key)
      * @return $this
      */
-    public function each($array, $callback) {
+    public function each($array, Closure $callback) : View {
         if (!is_array($array)) $array = array( $array );
         foreach ($array as $key => $el) {
             $callback($this, $el, $key);
@@ -273,12 +265,12 @@ abstract class View extends DirectView {
 
     /**
      * Append something conditional.
-     * @param boolean $cond A condition.
+     * @param bool|object $cond A condition.
      * @param Closure $thenCallback The then callback (View).
      * @param Closure|false $elseCallback The else callback (View).
      * @return $this
      */
-    public function conditional($cond, $thenCallback, $elseCallback = false) {
+    public function conditional($cond, Closure $thenCallback, $elseCallback = false) : View {
         if ($cond) {
             $thenCallback($this);
         } else {
@@ -293,7 +285,7 @@ abstract class View extends DirectView {
      * @param Closure $callback The callback.
      * @return $this
      */
-    public function self($callback) {
+    public function self(Closure $callback): View {
         $callback($this);
         return $this;
     }
@@ -302,7 +294,7 @@ abstract class View extends DirectView {
      * Get the unique id.
      * @return string
      */
-    public function id() {
+    public function id() : string {
         return (!$this->uniqueId ? '' : 's' . $this->uniqueId);
     }
 
