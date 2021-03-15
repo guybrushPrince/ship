@@ -249,10 +249,11 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Adds classes to a view.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|string[] $view The given view.
      * @param string|array $clazz The class(es) to add.
+     * @return ModifyProtocol
      */
-    public function addClass($view, $clazz) {
+    public function addClass($view, $clazz): ModifyProtocol {
         $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
@@ -268,7 +269,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param DirectView|string $view The given view.
      * @param string|array $clazz The class(es) to remove.
      */
-    public function removeClass($view, $clazz) {
+    public function removeClass($view, $clazz) : ModifyProtocol {
         $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
