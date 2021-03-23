@@ -199,6 +199,8 @@ class ActionRegister {
             $this->setResponse($response, $this->serializeView($retValue),  'text/html');
         } else if ($retValue instanceof ShipError) {
             $this->setResponse($response, fullJsonEncode($retValue), 'application/json', 404);
+        } else if ($retValue instanceof Script) {
+            $this->setResponse($response, $retValue->getCode(), 'application/javascript');
         } else {
             echo "ERROR";
         }
