@@ -139,6 +139,20 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Change size to the contents size.
+     * @param DirectView|string $view The given view.
+     * @return ModifyProtocol
+     */
+    public function makeEmpty($view) : ModifyProtocol {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "empty",
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
      * Try to set focus on the element.
      * @param DirectView|string $view The given view.
      */
