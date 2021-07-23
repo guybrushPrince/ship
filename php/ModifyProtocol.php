@@ -314,8 +314,12 @@ abstract class ModifyProtocol extends Protocol {
      * Toggle classes from a view.
      * @param string|array $clazz The class(es) to toggle.
      * @param DirectView|string|boolean $view The given view.
+     * @return ModifyProtocol
      */
     public function toggleClass($view, $clazz) {
+        if ($clazz instanceof TemplateObject) {
+            $this->addTemplateObject($clazz);
+        }
         $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(

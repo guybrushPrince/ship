@@ -131,6 +131,7 @@ class ActionRegister {
             $name = $param->getName();
             $type = $param->getClass();
             if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
+                if ($params[$name] === null) return null;
                 $class = $type->name;
                 if (array_key_exists($name . 'IClass', $params)) {
                     $class = $params[$name . 'IClass'];
