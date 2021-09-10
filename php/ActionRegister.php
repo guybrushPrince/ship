@@ -138,9 +138,11 @@ class ActionRegister {
                 }
                 $keyBinding = $class::getKeyBinding();
                 $key = ($keyBinding === 'i' ? self::deConvertKey($params[$name]) : $params[$name]);
-                return call_user_func($class . '::get',
+                $val =  call_user_func($class . '::get',
                     ($keyBinding === 'i' ? intval($key) : $key)
                 );
+                if (!$val) return null;
+                return $val;
             } else return $params[$name];
         }, $method->getParameters());
     }
