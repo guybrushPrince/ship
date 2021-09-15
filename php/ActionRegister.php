@@ -130,21 +130,44 @@ class ActionRegister {
         return array_map(function(ReflectionParameter $param) use ($params, $ignore) {
             $name = $param->getName();
             $type = $param->getClass();
+            $value = $params[$name];
             if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
-                if ($params[$name] === null) return null;
+                if ($value === null) return null;
                 $class = $type->name;
                 if (array_key_exists($name . 'IClass', $params)) {
                     $class = $params[$name . 'IClass'];
                 }
-                $keyBinding = $class::getKeyBinding();
-                $key = ($keyBinding === 'i' ? self::deConvertKey($params[$name]) : $params[$name]);
-                $val =  call_user_func($class . '::get',
-                    ($keyBinding === 'i' ? intval($key) : $key)
-                );
-                if (!$val) return null;
-                return $val;
-            } else return $params[$name];
+                return self::extractObject($class, $value);
+            } else if (is_array($value)) {
+                $first = $value[array_key_first($value)];
+                if (is_array($first)) {
+                    if (array_key_exists('IClass', $first)) {
+                        return array_map(function (array $content) {
+                            $class = $content['IClass'];
+                            $value = $content['value'];
+                            return self::extractObject($class, $value);
+                        }, $value);
+                    }
+                }
+                return $value;
+            } else return $value;
         }, $method->getParameters());
+    }
+
+    /**
+     * Tries to extract an object from the database.
+     * @param string $class The class.
+     * @param string|int $value The value.
+     * @return object|null
+     */
+    private static function extractObject(string $class, $value) : ?object {
+        $keyBinding = $class::getKeyBinding();
+        $key = ($keyBinding === 'i' ? self::deConvertKey($value) : $value);
+        $val =  call_user_func($class . '::get',
+            ($keyBinding === 'i' ? intval($key) : $key)
+        );
+        if (!$val) return null;
+        return $val;
     }
 
     /**
