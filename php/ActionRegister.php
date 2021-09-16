@@ -130,27 +130,30 @@ class ActionRegister {
         return array_map(function(ReflectionParameter $param) use ($params, $ignore) {
             $name = $param->getName();
             $type = $param->getClass();
-            $value = $params[$name];
-            if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
-                if ($value === null) return null;
-                $class = $type->name;
-                if (array_key_exists($name . 'IClass', $params)) {
-                    $class = $params[$name . 'IClass'];
-                }
-                return self::extractObject($class, $value);
-            } else if (is_array($value)) {
-                $first = $value[array_key_first($value)];
-                if (is_array($first)) {
-                    if (array_key_exists('IClass', $first)) {
-                        return array_map(function (array $content) {
-                            $class = $content['IClass'];
-                            $value = $content['value'];
-                            return self::extractObject($class, $value);
-                        }, $value);
+            if (array_key_exists($name, $params)) {
+                $value = $params[$name];
+
+                if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
+                    if ($value === null) return null;
+                    $class = $type->name;
+                    if (array_key_exists($name . 'IClass', $params)) {
+                        $class = $params[$name . 'IClass'];
                     }
-                }
-                return $value;
-            } else return $value;
+                    return self::extractObject($class, $value);
+                } else if (is_array($value)) {
+                    $first = $value[array_key_first($value)];
+                    if (is_array($first)) {
+                        if (array_key_exists('IClass', $first)) {
+                            return array_map(function (array $content) {
+                                $class = $content['IClass'];
+                                $value = $content['value'];
+                                return self::extractObject($class, $value);
+                            }, $value);
+                        }
+                    }
+                    return $value;
+                } else return $value;
+            } else return null;
         }, $method->getParameters());
     }
 
