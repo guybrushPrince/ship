@@ -275,15 +275,16 @@ class ActionRegister {
     /**
      * Set the response.
      * @param Response $response The response.
-     * @param string $body The content.
+     * @param string|null $body The content.
      * @param string $contentType The content type.
      * @param int $status The status of the response.
      * @return Response
      */
-    private function setResponse(Response $response, $body, $contentType = 'application/json', $status = 200) {
+    private function setResponse(Response $response, ?string $body, $contentType = 'application/json',
+                                 $status = 200) : Response {
         $response = $response->withHeader('Content-Type', $contentType . '; charset=utf-8')
                              ->withStatus($status);
-        if ($body !== null) $response->getBody()->write($body);
+        if ($body !== null) $response->getBody()->write($body . ' ');
         return $response;
     }
 

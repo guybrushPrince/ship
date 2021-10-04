@@ -333,7 +333,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param string|array $clazz The class(es) to remove.
      * @return $this
      */
-    public function removeClassSiblings($view, $clazz) {
+    public function removeClassSiblings($view, $clazz) : ModifyProtocol {
         $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = array( $clazz );
         $this->protocol[] = array(
