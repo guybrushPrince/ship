@@ -222,14 +222,14 @@ class ActionRegister {
             $isViewsArray = count(array_filter($retValue, function($val) {
                 return !($val instanceof View);
             })) === 0;
-            if ($isViewsArray) $this->setResponse($response, $this->serializeView($retValue),  'text/html');
+            if ($isViewsArray) $this->setResponse($response, $this->serializeView($retValue) . ' ',  'text/html');
             else $this->setResponse($response, simpleJsonEncode($retValue));
         } else if ($retValue instanceof View) {
-            $this->setResponse($response, $this->serializeView($retValue),  'text/html');
+            $this->setResponse($response, $this->serializeView($retValue) . ' ',  'text/html');
         } else if ($retValue instanceof ShipError) {
             $this->setResponse($response, fullJsonEncode($retValue), 'application/json', 404);
         } else if ($retValue instanceof Script) {
-            $this->setResponse($response, $retValue->getCode(), 'application/javascript');
+            $this->setResponse($response, $retValue->getCode() . ' ', 'application/javascript');
         } else {
             echo "ERROR";
         }
@@ -284,7 +284,7 @@ class ActionRegister {
                                  $status = 200) : Response {
         $response = $response->withHeader('Content-Type', $contentType . '; charset=utf-8')
                              ->withStatus($status);
-        if ($body !== null) $response->getBody()->write($body . ' ');
+        if ($body !== null) $response->getBody()->write($body);
         return $response;
     }
 
