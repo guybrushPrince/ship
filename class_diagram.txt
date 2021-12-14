@@ -1,0 +1,30 @@
+@startuml
+package "ship" {
+class ViewAccessRight {
+id : string
+role : integer
+rights : string
+
+access : Access
+}
+}
+
+package "breakwater" {
+class Group {
+name : string
+
+
+}
+
+
+
+
+
+
+}
+
+ViewAccessRight --> Group : group >
+
+
+
+@enduml
