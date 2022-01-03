@@ -110,6 +110,31 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Add a new view to an old view. The old view can exists. However, if not, there is
+     * a fallback view.
+     * @param DirectView|string $view The given view.
+     * @param DirectView|string $fallback The fallback view.
+     * @param DirectView|string|false $new The new view.
+     * @return $this
+     */
+    public function addWithFallback($view, $fallback, $new = false) : ModifyProtocol {
+        if ($new instanceof TemplateObject) {
+            $new->setIsView(true);
+            $this->addTemplateObject($new);
+        }
+        $view = $this->detectView($view);
+        $fallback = $this->detectView($fallback);
+        $prot = array(
+            "operation" => "addWithFallback",
+            "view"      => $view,
+            "fallback"  => $fallback
+        );
+        if ($new !== ModifyProtocol::$AS_IS) $prot["new"] = $new;
+        $this->protocol[] = $prot;
+        return $this;
+    }
+
+    /**
      * Prepends the new to the given view.
      * @param DirectView|string $view The given view.
      * @param DirectView|false|string $new The new view.
