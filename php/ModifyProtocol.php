@@ -10,16 +10,27 @@ abstract class ModifyProtocol extends Protocol {
      * The action implementation.
      * @var string
      */
-    protected $actionImplementation;
+    protected string $actionImplementation;
 
-    public static $AS_IS = "AS_IS";
+    /**
+     * The dialog implementation.
+     * @var string
+     */
+    protected string $dialogImplementation;
+
+    /**
+     * Constant.
+     * @var string
+     */
+    public static string $AS_IS = "AS_IS";
 
     /**
      * @inheritDoc
      */
-    public function __construct($parent, $actionImplementation) {
+    public function __construct($parent, string $actionImplementation, string $dialogImplementation) {
         parent::__construct($parent);
         $this->actionImplementation = $actionImplementation;
+        $this->dialogImplementation = $dialogImplementation;
     }
 
     /**
@@ -90,7 +101,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Add the new to the given view.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @param DirectView|false|string $new The new view.
      * @return $this
      */
@@ -112,9 +123,9 @@ abstract class ModifyProtocol extends Protocol {
     /**
      * Add a new view to an old view. The old view can exists. However, if not, there is
      * a fallback view.
-     * @param DirectView|string $view The given view.
-     * @param DirectView|string $fallback The fallback view.
-     * @param DirectView|string|false $new The new view.
+     * @param DirectView|string|TemplateObject $view The given view.
+     * @param DirectView|string|TemplateObject $fallback The fallback view.
+     * @param DirectView|string|false|TemplateObject $new The new view.
      * @return $this
      */
     public function addWithFallback($view, $fallback, $new = false) : ModifyProtocol {
@@ -157,7 +168,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Change the text of a view.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @param string|Closure|false $text The text.
      * @return $this
      */
@@ -176,7 +187,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Change size to the contents size.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @return $this
      */
     public function resize($view) {
@@ -190,7 +201,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Change size to the contents size.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @return $this
      */
     public function makeEmpty($view) : ModifyProtocol {
@@ -232,7 +243,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Removes all element specific styles.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @return $this
      */
     public function reset($view) {
@@ -246,8 +257,8 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Add the new after the given view.
-     * @param DirectView|string $view The given view.
-     * @param DirectView|false $new The new view.
+     * @param DirectView|string|TemplateObject $view The given view.
+     * @param DirectView|false|TemplateObject $new The new view.
      * @return $this
      */
     public function after($view, $new = false) {
@@ -266,8 +277,8 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Add the new before the given view.
-     * @param DirectView|string $view The given view.
-     * @param DirectView|false $new The new view.
+     * @param DirectView|string|TemplateObject $view The given view.
+     * @param DirectView|false|TemplateObject $new The new view.
      * @return $this
      */
     public function before($view, $new = false) {
@@ -286,8 +297,8 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Replace the given view with the new view.
-     * @param DirectView|string $view The given view.
-     * @param DirectView|false $new The new view.
+     * @param DirectView|string|TemplateObject $view The given view.
+     * @param DirectView|false|TemplateObject $new The new view.
      * @return $this
      */
     public function replace($view, $new = false) {
@@ -306,7 +317,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Clear the view.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @return $this
      */
     public function clear($view) {
@@ -320,7 +331,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Adds classes to a view.
-     * @param DirectView|string|string[] $view The given view.
+     * @param DirectView|string|string[]|TemplateObject $view The given view.
      * @param string|array $clazz The class(es) to add.
      * @return $this
      */
@@ -337,7 +348,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Removes classes from a view.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @param string|array $clazz The class(es) to remove.
      * @return $this
      */
@@ -354,7 +365,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Removes classes from all view siblings.
-     * @param DirectView|string $view The given view.
+     * @param DirectView|string|TemplateObject $view The given view.
      * @param string|array $clazz The class(es) to remove.
      * @return $this
      */
@@ -372,7 +383,7 @@ abstract class ModifyProtocol extends Protocol {
     /**
      * Toggle classes from a view.
      * @param string|array $clazz The class(es) to toggle.
-     * @param DirectView|string|boolean $view The given view.
+     * @param DirectView|string|boolean|TemplateObject $view The given view.
      * @return $this
      */
     public function toggleClass($view, $clazz) {
@@ -391,7 +402,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Delete the view.
-     * @param DirectView|string $view The view.
+     * @param DirectView|string|TemplateObject $view The view.
      * @return $this
      */
     public function delete($view) {
@@ -406,7 +417,7 @@ abstract class ModifyProtocol extends Protocol {
     /**
      * Throw an event on the view.
      * @param integer $event The event.
-     * @param DirectView|string $view The view.
+     * @param DirectView|string|TemplateObject $view The view.
      * @param array|false $data Some additional data.
      * @return $this
      */
@@ -449,6 +460,24 @@ abstract class ModifyProtocol extends Protocol {
             "title"      => $title,
             "seaStar"    => $seaStar
         );
+        return $obj;
+    }
+
+    /**
+     * Print an alert and do only something if the right option was taken.
+     * @param array $texts The texts.
+     * @param array|null $options The options (optional).
+     * @return DialogProtocol
+     */
+    public function alert(array $texts = [], ?array $options = null) : DialogProtocol {
+        $impl = $this->dialogImplementation;
+        $obj = new $impl($this, $texts, $options);
+        $this->protocol[] = [
+            "operation"  => "alert",
+            "texts"      => $texts,
+            "options"    => $options,
+            "protocol"   => $obj
+        ];
         return $obj;
     }
 

@@ -298,4 +298,12 @@ abstract class View extends DirectView {
         return (!$this->uniqueId ? '' : 's' . $this->uniqueId);
     }
 
+    /**
+     * Forces to set the unique id to the given one.
+     * @param string $id The id.
+     */
+    public function forceUniqueIdIntern(string $id) {
+        $this->uniqueId = $id;
+    }
+
 }
