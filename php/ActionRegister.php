@@ -285,8 +285,6 @@ class ActionRegister {
                 if (intval($n) . '' === $n) $c[intval($n)] = $v;
                 else $c[$k] = $v;
             } else $c[$k] = $v;
-
-            $c[is_int($k) ? 'i' . $k : $k] = (is_array($a[$k]) ? self::preserveArrayKeys($a[$k]) : $a[$k]);
             return $c;
         }, []);
     }
