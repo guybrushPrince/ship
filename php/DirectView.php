@@ -33,6 +33,14 @@ abstract class DirectView {
     public abstract function protocol(int $event, array $params = []);
 
     /**
+     * Adds a first action to the view.
+     * @param int $event The event.
+     * @param array $params Some optional event parameters.
+     * @return mixed
+     */
+    public abstract function firstProtocol(int $event, array $params = []);
+
+    /**
      * The access is granted if the access is set.
      * @param string|array $access
      */

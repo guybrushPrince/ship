@@ -141,14 +141,16 @@ class ActionRegister {
                     }
                     return self::extractObject($class, $value);
                 } else if (is_array($value)) {
-                    $first = $value[array_key_first($value)];
-                    if (is_array($first)) {
-                        if (array_key_exists('IClass', $first)) {
-                            return array_map(function (array $content) {
-                                $class = $content['IClass'];
-                                $value = $content['value'];
-                                return self::extractObject($class, $value);
-                            }, $value);
+                    if (!Tools::isEmpty($value)) {
+                        $first = $value[array_key_first($value)];
+                        if (is_array($first)) {
+                            if (array_key_exists('IClass', $first)) {
+                                return array_map(function (array $content) {
+                                    $class = $content['IClass'];
+                                    $value = $content['value'];
+                                    return self::extractObject($class, $value);
+                                }, $value);
+                            }
                         }
                     }
                     return self::unpreserveArrayKeys($value);;

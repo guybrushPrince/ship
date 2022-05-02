@@ -67,6 +67,20 @@ class TextView extends View {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function firstProtocol(int $event, array $params = []) {
+        if ($this->parent() instanceof HtmlView) {
+            $pro = new HtmlEventProtocol($event, $this, $params);
+            array_unshift($this->protocols, $pro);
+            $pro = $pro->modify();
+            return $pro;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Return a new text view.
      * @return TextView
      */
