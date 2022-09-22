@@ -138,6 +138,9 @@ class ActionRegister {
                     $class = $type->name;
                     if (array_key_exists($name . 'IClass', $params)) {
                         $class = $params[$name . 'IClass'];
+                    } else if (strpos($value, '<::>')) {
+                        $class = substr($value, 0, strpos($value, '<::>'));
+                        $value = substr($value, strpos($value, '<::>') + 4);
                     }
                     return self::extractObject($class, $value);
                 } else if (is_array($value)) {
@@ -166,6 +169,11 @@ class ActionRegister {
      * @return object|null
      */
     private static function extractObject(string $class, $value) : ?object {
+        if ($class === 'HtmlView') {
+            $view = new HtmlView();
+            $view->forceUniqueIdIntern(substr($value, 2));
+            return $view;
+        }
         $keyBinding = $class::getKeyBinding();
         $key = ($keyBinding === 'i' ? self::deConvertKey($value) : $value);
         $val =  call_user_func($class . '::get',

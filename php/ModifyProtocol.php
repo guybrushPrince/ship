@@ -185,6 +185,23 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Set the value of an input field or selector.
+     * @param DirectView|string|TemplateObject $view The given view.
+     * @param CObject|string|bool|int|float|TemplateObject $value The value.
+     * @return $this
+     */
+    public function value($view, $value = false) : ModifyProtocol {
+        $view = $this->detectView($view);
+        $prot = array(
+            "operation" => "value",
+            "view"      => $view,
+            "value"     => ($value instanceof CObject ? get_class($value) . '<::>' . ActionRegister::convertKey($value->getId()) : $value)
+        );
+        $this->protocol[] = $prot;
+        return $this;
+    }
+
+    /**
      * Change size to the contents size.
      * @param DirectView|string|TemplateObject $view The given view.
      * @return $this
