@@ -290,6 +290,7 @@ class ActionRegister {
     private static function unpreserveArrayKeys(array $a) : array {
         return array_reduce(array_keys($a), function (array $c, $k) use ($a) {
             $v = (is_array($a[$k]) ? self::unpreserveArrayKeys($a[$k]) : $a[$k]);
+            $k = str_replace('__WS__', ' ', $k);
             if (Tools::startsWith('i', $k)) {
                 $n = substr($k, 1);
                 if (intval($n) . '' === $n) $c[intval($n)] = $v;
