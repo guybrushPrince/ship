@@ -175,6 +175,7 @@ class ActionRegister {
             return $view;
         }
         $keyBinding = $class::getKeyBinding();
+        if (is_array($value) && array_key_exists('value', $value)) $value = $value['value'];
         $key = ($keyBinding === 'i' ? self::deConvertKey($value) : $value);
         $val =  call_user_func($class . '::get',
             ($keyBinding === 'i' ? intval($key) : $key)

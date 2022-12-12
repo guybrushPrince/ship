@@ -440,12 +440,15 @@ abstract class ModifyProtocol extends Protocol {
      * Throw an event on the view.
      * @param int|TemplateObject $event The event.
      * @param DirectView|string|TemplateObject $view The view.
-     * @param array|false $data Some additional data.
+     * @param array|false|TemplateObject $data Some additional data.
      * @return $this
      */
     public function throwevent($event, $view, $data = false) : ModifyProtocol {
         if ($event instanceof TemplateObject) {
             $this->addTemplateObject($event);
+        }
+        if ($data instanceof TemplateObject) {
+            $this->addTemplateObject($data);
         }
         $view = $this->detectView($view);
         $this->protocol[] = array(
