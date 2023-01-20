@@ -8,25 +8,38 @@ class ShipError extends CliffSerializable {
 
     /**
      * The code of the error.
-     * @var integer
+     * @var int
      */
-    protected $errorCode;
+    protected int $errorCode;
 
     /**
      * The error message.
      * @var string
      */
-    protected $message;
+    protected string $message;
 
     /**
      * Error constructor.
      * @param string $message (optional) The message.
-     * @param integer $errorCode (optional) The error code.
+     * @param int $errorCode (optional) The error code.
      */
-    public function __construct($message = "", $errorCode = 1) {
+    public function __construct(string $message = "", int $errorCode = 1) {
         $this->errorCode = $errorCode;
         $this->message = $message;
     }
 
+    /**
+     * @return int
+     */
+    public function getErrorCode(): int {
+        return $this->errorCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage(): string {
+        return $this->message;
+    }
 }
 ?>
