@@ -266,10 +266,11 @@ class ActionRegister {
 
     /**
      * Adds a view class that should not be parsed.
-     * @param string $clazz The class.
+     * @param string|string[] $clazz The class.
      */
-    public function parseNotCompletely(string $clazz) {
-        $this->notComplete[] = $clazz;
+    public function parseNotCompletely(string|array $clazz) {
+        if (!is_array($clazz)) $this->notComplete[] = $clazz;
+        else $this->notComplete = array_merge($this->notComplete, $clazz);
     }
 
     /**
