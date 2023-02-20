@@ -30,6 +30,12 @@ class ActionRegister {
     private array $notComplete = array();
 
     /**
+     * Additional middlewares that are added.
+     * @var string[]
+     */
+    private array $middlewares = [];
+
+    /**
      * Create or get the singleton action protocol instance.
      * @param RouteCollectorProxy|null $app
      * @return ActionRegister
@@ -107,9 +113,11 @@ class ActionRegister {
                         $this->app->get('/api/' . $method->getName(), $fun);
                     } else if ($isGetParameters) {
                         $route = $this->app->get('/{user}/{group}/api/' . $method->getName(), $fun);
+                        foreach ($this->middlewares as $middleware) $route->add($middleware);
                         $route->add(TwilightMiddleware::class);
                     } else if (!$without) {
                         $route = $this->app->post('/{user}/{group}/api/' . $method->getName(), $fun);
+                        foreach ($this->middlewares as $middleware) $route->add($middleware);
                         $route->add(TwilightMiddleware::class);
                     } else {
                         $this->app->post('/api/' . $method->getName(), $fun);
@@ -262,6 +270,15 @@ class ActionRegister {
                 return $view->generate($this->shouldParsedCompletely($view), true);
             } else return '';
         }, $views));
+    }
+
+    /**
+     * Add a middleware.
+     * @param string $middleware The middleware.
+     * @return void
+     */
+    public function addMiddleware(string $middleware) : void {
+        if (class_exists($middleware)) $this->middlewares[] = $middleware;
     }
 
     /**
