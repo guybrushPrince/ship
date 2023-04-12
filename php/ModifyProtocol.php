@@ -540,6 +540,17 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Reloads the page.
+     * @return $this
+     */
+    public function reload() : ModifyProtocol {
+        $this->protocol[] = array(
+            "operation"  => "reload"
+        );
+        return $this;
+    }
+
+    /**
      * Call a template.
      * @param string $name The name of the template.
      * @param array $context A mapping from the template objects to real objects.

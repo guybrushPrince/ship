@@ -4,6 +4,7 @@ include_once dirname(__FILE__) . '/../../yarn/CoastSerializableFunctions.php';
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
+use Slim\Routing\RouteContext;
 
 /**
  * Class ActionRegister
@@ -34,6 +35,12 @@ class ActionRegister {
      * @var string[]
      */
     private array $middlewares = [];
+
+    /**
+     * A protocol that is executed if the session has a timeout.
+     * @var Protocol|null
+     */
+    private ?Protocol $sessionTimeout = null;
 
     /**
      * Create or get the singleton action protocol instance.
@@ -71,6 +78,15 @@ class ActionRegister {
     }
 
     /**
+     * Bind the session timeout protocol.
+     * @param Protocol|null $protocol The protocol.
+     * @return void
+     */
+    public function bindSessionTimeout(?Protocol $protocol) {
+        $this->sessionTimeout = $protocol;
+    }
+
+    /**
      * Register a controller.
      * @param array|string $classNames The class name of the controller.
      * @throws ReflectionException
@@ -83,10 +99,20 @@ class ActionRegister {
             if ($this->app) {
                 foreach ($clazz->getMethods() as $method) {
                     // Create a service function that maps parameters and handles the output.
-                    $fun = function (Request $request, Response $response, array $args) use ($obj, $method) {
+                    $isGet = $this->isGet($method);
+                    $without = $this->isWithout($method);
+                    $isGetParameters = $this->hasURLParameters($method);
+                    $fun = function (Request $request, Response $response, array $args) use ($obj, $method, $without, $isGet) {
                         $user = array_key_exists('user', $args) ? $args['user'] : false;
                         $group = array_key_exists('group', $args) ? $args['group'] : false;
                         $closure = $method->getClosure($obj);
+
+                        if ((!$without && !($isGet && $isGet >= 0)) && Persistence::instance()->getUserSession() === null) {
+                            if ($this->sessionTimeout) {
+                                $response = $this->setResponse($response, $this->sessionTimeout->generate(), 'application/javascript');
+                            }
+                            return $response;
+                        }
 
                         // Get the json object with all information
                         if ($this->hasURLParameters($method)) {
@@ -106,9 +132,6 @@ class ActionRegister {
                     };
 
                     // Register the service function as REST service
-                    $isGet = $this->isGet($method);
-                    $without = $this->isWithout($method);
-                    $isGetParameters = $this->hasURLParameters($method);
                     if ($isGet && $isGet >= 0) {
                         $this->app->get('/api/' . $method->getName(), $fun);
                     } else if ($isGetParameters) {
