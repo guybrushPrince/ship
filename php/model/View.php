@@ -196,6 +196,7 @@ abstract class View extends DirectView {
      * @inheritDoc
      */
     public function ref($id, $scope = false, $view = false) {
+        if (is_object($id)) $id = self::getObjectId($id);
         parent::ref($id, $scope, $view);
         if (!$this->uniqueId) {
             $this->uniqueId = $this->generateId();

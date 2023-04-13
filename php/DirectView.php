@@ -81,5 +81,14 @@ abstract class DirectView {
         return $this->names;
     }
 
+    /**
+     * Return the id of the object.
+     * @param CObject $object The object id.
+     * @return string
+     */
+    protected static function getObjectId(CObject $object) {
+        return get_class($object) . ':' . $object->getId();
+    }
+
 }
 ?>
