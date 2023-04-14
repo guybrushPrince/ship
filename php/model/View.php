@@ -209,6 +209,65 @@ abstract class View extends DirectView {
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function pick($object) {
+        $view = parent::pick($object);
+        if ($view) return $view;
+        if ($view === null && $this->parent !== null) {
+            return $this->parent->pick($object);
+        } else {
+            $id = self::getObjectId($object);
+            if ($view === null && isset($_SESSION) && array_key_exists('objects', $_SESSION) &&
+                array_key_exists($id, $_SESSION['objects'])) {
+                return array_map(function($uniqueId) {
+                    $view = new TextView();
+                    $view->uniqueId = $uniqueId;
+                    return $view;
+                }, $_SESSION['objects'][$id]);
+            }
+            return $view;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bind($object, ?DirectView $view = null) {
+        parent::bind($object, $view);
+        if (isset($_SESSION)) {
+            if (!array_key_exists('objects', $_SESSION)) $_SESSION['objects'] = [];
+            $id = self::getObjectId($object);
+            if (!array_key_exists($id, $_SESSION['objects'])) $_SESSION['objects'][$id] = [];
+            $_SESSION['objects'][$id][] = $this->uniqueId;
+        }
+        if ($this->parent !== null) $this->parent->bind($object, ($view ? $view : $this));
+        return $this;
+    }
+
+    /**
+     * Internal function: Garbage collector.
+     * @param string[] $alive Views that are alive.
+     * @return void
+     */
+    public static function _gc(array $alive) {
+        if (isset($_SESSION)) {
+            if (array_key_exists('references', $_SESSION)) {
+                $_SESSION['references'] = array_filter($_SESSION['references'], function ($uniqueId) use ($alive) {
+                    return in_array($uniqueId, $alive);
+                });
+            }
+            if (array_key_exists('objects', $_SESSION)) {
+                $_SESSION['objects'] = array_filter($_SESSION['objects'], function (array $uniqueIds) use ($alive) {
+                    return !Tools::isEmpty(array_filter($uniqueIds, function($uI) use ($alive) {
+                        return in_array($uI, $alive);
+                    }));
+                });
+            }
+        }
+    }
+
 
 
     // Short cuts

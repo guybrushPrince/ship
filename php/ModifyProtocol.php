@@ -439,7 +439,7 @@ abstract class ModifyProtocol extends Protocol {
     /**
      * Throw an event on the view.
      * @param int|TemplateObject $event The event.
-     * @param DirectView|string|TemplateObject $view The view.
+     * @param DirectView|string|TemplateObject|PersistentTrait $view The view.
      * @param array|false|TemplateObject $data Some additional data.
      * @return $this
      */
@@ -569,8 +569,17 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Call the garbage collector.
+     * @return $this
+     */
+    public function gc() : ModifyProtocol {
+        $this->protocol[] = ["operation" => 'gc'];
+        return $this;
+    }
+
+    /**
      * Detects the view if the view is a string or returns the string itself.
-     * @param string|array|TemplateObject $view The view(s).
+     * @param string|array|TemplateObject|PersistentTrait $view The view(s).
      * @return string|array|DirectView|TemplateObject
      */
     protected function detectView($view) {
@@ -590,8 +599,8 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Detects a single view.
-     * @param string|DirectView|TemplateObject $view The view.
-     * @return string|DirectView|TemplateObject
+     * @param string|DirectView|TemplateObject|PersistentTrait $view The view.
+     * @return string|DirectView|TemplateObject|DirectView[]
      */
     private function detectSingleView($view) {
         if ($view instanceof TemplateObject) {
@@ -603,6 +612,9 @@ abstract class ModifyProtocol extends Protocol {
             if (is_string($view)) {
                 $v = $this->innerView()->get($view);
                 if ($v !== null) $v = $v["view"];
+            } else if (is_object($view) && !($view instanceof View)) {
+                $v = $this->innerView()->pick($view);
+                if ($v) return $v;
             }
             if ($v !== null) $view = $v;
         }

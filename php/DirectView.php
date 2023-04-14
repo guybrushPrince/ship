@@ -19,6 +19,12 @@ abstract class DirectView {
     protected $names = array();
 
     /**
+     * A list of assigned objects.
+     * @var array
+     */
+    protected $objects = [];
+
+    /**
      * An array with protocols.
      * @var array
      */
@@ -74,6 +80,30 @@ abstract class DirectView {
     }
 
     /**
+     * Pick the view if it is bound to the given object.
+     * @param $object
+     * @return DirectView[]|null
+     */
+    public function pick($object) {
+        $id = self::getObjectId($object);
+        if (array_key_exists($id, $this->objects)) {
+            return $this->objects[$id];
+        } else return null;
+    }
+
+    /**
+     * Bind an object to a view.
+     * @param PersistentTrait $object The object.
+     * @return $this
+     */
+    public function bind($object, ?DirectView $view = null) {
+        $id = self::getObjectId($object);
+        if (!array_key_exists($id, $this->objects)) $this->objects[$id] = [];
+        $this->objects[$id][] = ($view ? $view : $this);
+        return $this;
+    }
+
+    /**
      * Get the reference names of this view.
      * @return array
      */
@@ -83,11 +113,11 @@ abstract class DirectView {
 
     /**
      * Return the id of the object.
-     * @param CObject $object The object id.
+     * @param PersistentTrait $object The object id.
      * @return string
      */
-    protected static function getObjectId(CObject $object) {
-        return get_class($object) . ':' . $object->getId();
+    protected static function getObjectId($object) {
+        return get_class($object) . ':' . $object->getKey();
     }
 
 }
