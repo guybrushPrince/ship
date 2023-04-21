@@ -255,13 +255,13 @@ abstract class View extends DirectView {
         if (isset($_SESSION)) {
             if (array_key_exists('references', $_SESSION)) {
                 $_SESSION['references'] = array_filter($_SESSION['references'], function ($uniqueId) use ($alive) {
-                    return in_array($uniqueId, $alive);
+                    return in_array('s' . $uniqueId, $alive);
                 });
             }
             if (array_key_exists('objects', $_SESSION)) {
                 $_SESSION['objects'] = array_filter($_SESSION['objects'], function (array $uniqueIds) use ($alive) {
                     return !Tools::isEmpty(array_filter($uniqueIds, function($uI) use ($alive) {
-                        return in_array($uI, $alive);
+                        return in_array('s' . $uI, $alive);
                     }));
                 });
             }
