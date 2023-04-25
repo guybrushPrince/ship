@@ -264,14 +264,14 @@ class ActionRegister {
             $isViewsArray = count(array_filter($retValue, function($val) {
                 return !($val instanceof View);
             })) === 0;
-            if ($isViewsArray) $this->setResponse($response, $this->serializeView($retValue) . ' ',  'text/html');
-            else $this->setResponse($response, simpleJsonEncode($retValue));
+            if ($isViewsArray) $response = $this->setResponse($response, $this->serializeView($retValue) . ' ',  'text/html');
+            else $response = $this->setResponse($response, simpleJsonEncode($retValue));
         } else if ($retValue instanceof View) {
-            $this->setResponse($response, $this->serializeView($retValue) . ' ',  'text/html');
+            $response = $this->setResponse($response, $this->serializeView($retValue) . ' ',  'text/html');
         } else if ($retValue instanceof ShipError) {
-            $this->setResponse($response, fullJsonEncode($retValue), 'application/json', 404);
+            $response = $this->setResponse($response, fullJsonEncode($retValue), 'application/json', 404);
         } else if ($retValue instanceof Script) {
-            $this->setResponse($response, $retValue->getCode() . ' ', 'application/javascript');
+            $response = $this->setResponse($response, $retValue->getCode() . ' ', 'application/javascript');
         } else {
             echo "ERROR";
         }
