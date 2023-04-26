@@ -235,10 +235,10 @@ abstract class View extends DirectView {
      * @inheritDoc
      */
     public function bind($object, ?DirectView $view = null) {
-        parent::bind($object, $view);
         if (!$this->uniqueId) {
             $this->uniqueId = $this->generateId();
         }
+        parent::bind($object, $view);
         if (isset($_SESSION)) {
             if (!array_key_exists('objects', $_SESSION)) $_SESSION['objects'] = [];
             $id = self::getObjectId($object);
