@@ -69,6 +69,7 @@ abstract class View extends DirectView {
     public function add(View $view) : View {
         $this->subviews[] = $view;
         $view->parent = $this;
+        foreach ($view->references as $name => $info) $this->ref($name, $info["scope"], $info["view"]);
         return $view;
     }
 
