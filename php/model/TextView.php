@@ -10,9 +10,9 @@ class TextView extends View {
 
     /**
      * The texts in an associative array.
-     * @var array
+     * @var string[]
      */
-    protected $texts = array();
+    protected array $texts = array();
 
     /**
      * @inheritDoc
@@ -32,22 +32,22 @@ class TextView extends View {
 
     /**
      * Add a text.
-     * @param integer $language The language.
+     * @param int $language The language.
      * @param string $text The text.
      */
-    public function addText($language, $text) {
+    public function addText(int $language, string $text) {
         $this->texts[$language] = $text;
     }
 
-    // Short cuts
+    // Shortcuts
 
     /**
      * @see TextView->addText
-     * @param integer $language The language.
+     * @param int $language The language.
      * @param string $text The text.
      * @return TextView
      */
-    public function text($language, $text) {
+    public function text(int $language, string $text) {
         $this->addText($language, Tools::maskTypical($text));
         return $this;
     }

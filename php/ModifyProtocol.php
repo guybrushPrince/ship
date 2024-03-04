@@ -551,6 +551,19 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Print a function code.
+     * @param string|TemplateObject $code The code.
+     * @return $this
+     */
+    public function function($code) : ModifyProtocol {
+        $this->protocol[] = array(
+            "operation"  => "function",
+            "code" => $code
+        );
+        return $this;
+    }
+
+    /**
      * Call a template.
      * @param string $name The name of the template.
      * @param array $context A mapping from the template objects to real objects.

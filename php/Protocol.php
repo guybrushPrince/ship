@@ -105,8 +105,9 @@ abstract class Protocol {
     private function collectParametersInArray(array $parameters) {
         return Tools::flatten(array_filter(array_map(function($param) {
             if ($param instanceof TemplateObject) return $param;
-            if (is_array($param)) return $this->collectParametersInArray($param);
-            if ($param instanceof Protocol) return $param->collectParameters();
+            else if ($param instanceof JSFunction) return $param;
+            else if (is_array($param)) return $this->collectParametersInArray($param);
+            else if ($param instanceof Protocol) return $param->collectParameters();
             return false;
         }, $parameters), function($param) {
             return $param ? true : false;

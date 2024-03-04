@@ -37,7 +37,7 @@ abstract class IfThenElseProtocol extends Protocol {
      */
     public function cond() {
         $this->protocol[] = array(
-            "operation" => "then"
+            "operation" => "if"
         );
         $impl = $this->conditionImplementation;
         return new $impl($this);
