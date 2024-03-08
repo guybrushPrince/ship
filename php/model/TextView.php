@@ -44,10 +44,11 @@ class TextView extends View {
     /**
      * @see TextView->addText
      * @param int $language The language.
-     * @param string $text The text.
+     * @param string|null $text The text.
      * @return TextView
      */
-    public function text(int $language, string $text) {
+    public function text(int $language, ?string $text) {
+        if ($text === null) $text = '';
         $this->addText($language, Tools::maskTypical($text));
         return $this;
     }
