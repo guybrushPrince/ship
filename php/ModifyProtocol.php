@@ -216,7 +216,7 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
-     * Change size to the contents size.
+     * Remove all sub views from the view.
      * @param DirectView|string|TemplateObject $view The given view.
      * @return $this
      */
