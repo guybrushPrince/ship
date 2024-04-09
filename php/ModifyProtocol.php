@@ -460,6 +460,31 @@ abstract class ModifyProtocol extends Protocol {
         return $this;
     }
 
+    /**
+     * Opens a new browser popup window with a given url and name.
+     * @param string|TemplateObject $url The url.
+     * @param string|TemplateObject $name The name of the window.
+     * @return $this
+     */
+    public function openWindow($url, $name, $protocol = null) : ModifyProtocol {
+        if ($url instanceof TemplateObject) {
+            $this->addTemplateObject($url);
+        }
+        if ($name instanceof TemplateObject) {
+            $this->addTemplateObject($name);
+        }
+        if ($protocol instanceof TemplateObject) {
+            $this->addTemplateObject($protocol);
+        }
+        $this->protocol[] = array(
+            "operation" => "openWindow",
+            "url"       => $url,
+            "name"      => $name,
+            "protocol"  => $protocol
+        );
+        return $this;
+    }
+
     public function modify() {
 
     }
