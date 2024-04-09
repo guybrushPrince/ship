@@ -119,11 +119,12 @@ abstract class View extends DirectView {
 
     /**
      * Generate code.
-     * @param boolean $complete Whether with all information or not.
-     * @param boolean $templates Whether with templates or not.
+     * @param bool $complete Whether with all information or not.
+     * @param bool $templates Whether with templates or not.
+     * @param bool $force Whether the templates shall be generated even though they were already generated.
      * @return string
      */
-    public abstract function generate($complete = false, $templates = false) : string;
+    public abstract function generate($complete = false, $templates = false, $force = false) : string;
 
     /**
      * Set the language.

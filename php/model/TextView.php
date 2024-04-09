@@ -17,7 +17,7 @@ class TextView extends View {
     /**
      * @inheritDoc
      */
-    public function generate($complete = false, $templates = false) : string {
+    public function generate($complete = false, $templates = false, $force = false) : string {
         if (array_key_exists(TextView::$language, $this->texts)) {
             return $this->texts[TextView::$language];
         } else {
