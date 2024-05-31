@@ -167,6 +167,17 @@ class ActionRegister {
                 if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
                     if ($value === null) return null;
                     $class = $type->name;
+                    if (is_array($value)) {
+                        return array_map(function ($val) use ($class) {
+                            if (array_key_exists('IClass', $val)) {
+                                $class = $val['IClass'];
+                            } else if (strpos($val, '<::>')) {
+                                $class = substr($val, 0, strpos($val, '<::>'));
+                                $val = substr($val, strpos($val, '<::>') + 4);
+                            }
+                            return self::extractObject($class, $val);
+                        }, $value);
+                    }
                     if (array_key_exists($name . 'IClass', $params)) {
                         $class = $params[$name . 'IClass'];
                     } else if (strpos($value, '<::>')) {

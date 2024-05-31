@@ -95,19 +95,26 @@ abstract class View extends DirectView {
     /**
      * Checks whether it is safe or not.
      * @return bool
+     * @throws DatabaseError
      */
     protected function isSafe() : bool {
         if (count($this->access) === 0) return true;
         if (isset($_SESSION) &&
+            array_key_exists('user', $_SESSION) &&
             array_key_exists('group', $_SESSION) &&
             array_key_exists('role', $_SESSION)) {
 
             if (!array_key_exists('rights', $_SESSION)) {
-                $rights = ViewAccessRight::get($_SESSION['group'] . ':' . $_SESSION['role']);
-                if ($rights && $rights instanceof ViewAccessRight) {
-                    $_SESSION['rights'] = $rights->getRightsList();
+                $user = User::get($_SESSION['user']);
+                if (in_array(SystemRole::SUPERUSER, $user->getSystemRolesList())) {
+                    $_SESSION['rights'] = SunstoneAccessRights::$accessRights;
                 } else {
-                    $_SESSION['rights'] = array();
+                    $rights = ViewAccessRight::get($_SESSION['group'] . ':' . $_SESSION['role']);
+                    if ($rights && $rights instanceof ViewAccessRight) {
+                        $_SESSION['rights'] = $rights->getRightsList();
+                    } else {
+                        $_SESSION['rights'] = array();
+                    }
                 }
             }
             if (count(array_intersect($_SESSION['rights'], $this->access)) > 0) {
