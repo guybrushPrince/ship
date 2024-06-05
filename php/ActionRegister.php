@@ -167,7 +167,7 @@ class ActionRegister {
                 if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
                     if ($value === null) return null;
                     $class = $type->name;
-                    if (is_array($value)) {
+                    if (is_array($value) && !Tools::hasStringKeys($value)) {
                         return array_map(function ($val) use ($class) {
                             if (array_key_exists('IClass', $val)) {
                                 $class = $val['IClass'];
