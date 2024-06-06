@@ -160,32 +160,43 @@ class ActionRegister {
     public static function mapMethodParameters(ReflectionMethod $method, array $params, array $ignore = []): array {
         return array_map(function(ReflectionParameter $param) use ($params, $ignore) {
             $name = $param->getName();
-            $type = $param->getClass();
+            $type = $param->getType();
             if (array_key_exists($name, $params)) {
                 $value = $params[$name];
 
-                if ($type !== null && !Tools::isScalar($type->name) && !in_array($type->name, $ignore)) {
-                    if ($value === null) return null;
-                    $class = $type->name;
-                    if (is_array($value) && !Tools::hasStringKeys($value)) {
-                        return array_map(function ($val) use ($class) {
-                            if (array_key_exists('IClass', $val)) {
-                                $class = $val['IClass'];
-                            } else if (strpos($val, '<::>')) {
-                                $class = substr($val, 0, strpos($val, '<::>'));
-                                $val = substr($val, strpos($val, '<::>') + 4);
+                if ($type !== null) {
+                    $types = ($type instanceof ReflectionNamedType ? [ $type->getName() ] : array_map(function (ReflectionType $t) {
+                        return $t->getName();
+                    }, $type->getTypes()));
+
+                    $types = array_diff($types, array_merge($ignore, ['null', 'array']));
+                    if (!Tools::isEmpty($types)) {
+                        $class = $types[array_key_first($types)];
+
+                        if (!Tools::isScalar($class)) {
+                            if ($value === null) return null;
+                            if (is_array($value) && !Tools::hasStringKeys($value)) {
+                                return array_map(function ($val) use ($class) {
+                                    if (array_key_exists('IClass', $val)) {
+                                        $class = $val['IClass'];
+                                    } else if (strpos($val, '<::>')) {
+                                        $class = substr($val, 0, strpos($val, '<::>'));
+                                        $val = substr($val, strpos($val, '<::>') + 4);
+                                    }
+                                    return self::extractObject($class, $val);
+                                }, $value);
                             }
-                            return self::extractObject($class, $val);
-                        }, $value);
+                            if (array_key_exists($name . 'IClass', $params)) {
+                                $class = $params[$name . 'IClass'];
+                            } else if (strpos($value, '<::>')) {
+                                $class = substr($value, 0, strpos($value, '<::>'));
+                                $value = substr($value, strpos($value, '<::>') + 4);
+                            }
+                            return self::extractObject($class, $value);
+                        }
                     }
-                    if (array_key_exists($name . 'IClass', $params)) {
-                        $class = $params[$name . 'IClass'];
-                    } else if (strpos($value, '<::>')) {
-                        $class = substr($value, 0, strpos($value, '<::>'));
-                        $value = substr($value, strpos($value, '<::>') + 4);
-                    }
-                    return self::extractObject($class, $value);
-                } else if (is_array($value)) {
+                }
+                if (is_array($value)) {
                     if (!Tools::isEmpty($value)) {
                         $first = $value[array_key_first($value)];
                         if (is_array($first)) {
@@ -198,7 +209,7 @@ class ActionRegister {
                             }
                         }
                     }
-                    return self::unpreserveArrayKeys($value);;
+                    return self::unpreserveArrayKeys($value);
                 } else return $value;
             } else return null;
         }, $method->getParameters());
