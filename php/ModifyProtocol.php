@@ -461,6 +461,39 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Throw an event on the view.
+     * @param int|TemplateObject $event The event.
+     * @param TemplateObject|PersistentTrait $view The view.
+     * @param TemplateObject|string|string[]|null $scopes The scope.
+     * @param array|null|TemplateObject $data Some additional data.
+     * @return $this
+     */
+    public function throwObjectEvent($event, $object, $scopes = null, $data = null) : ModifyProtocol {
+        if ($event instanceof TemplateObject) {
+            $this->addTemplateObject($event);
+        }
+        if ($object instanceof TemplateObject) {
+            $this->addTemplateObject($object);
+        }
+        if ($scopes instanceof TemplateObject) {
+            $this->addTemplateObject($scopes);
+        } else if ($scopes && is_string($scopes)) {
+            $scopes = [ $scopes ];
+        }
+        if ($data instanceof TemplateObject) {
+            $this->addTemplateObject($data);
+        }
+        $this->protocol[] = array(
+            "operation" => "throwObjectEvent",
+            "event"     => $event,
+            "object"    => $object,
+            "scopes"    => $scopes,
+            "data"      => $data
+        );
+        return $this;
+    }
+
+    /**
      * Opens a new browser popup window with a given url and name.
      * @param string|TemplateObject $url The url.
      * @param string|TemplateObject $name The name of the window.

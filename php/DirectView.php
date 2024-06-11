@@ -94,9 +94,14 @@ abstract class DirectView {
     /**
      * Bind an object to a view.
      * @param PersistentTrait $object The object.
+     * @param int|null $event The event to react on.
+     * @param ModifyProtocol|null $protocol The protocol to execute on the event.
+     * @param string|null $scope A possible scope for the event.
+     * @param DirectView|null $view (internal).
      * @return $this
      */
-    public function bind($object, ?DirectView $view = null) {
+    public function bind($object, ?int $event = null, ?ModifyProtocol $protocol = null, ?string $scope = null,
+                         ?DirectView $view = null) {
         $id = self::getObjectId($object);
         if (!array_key_exists($id, $this->objects)) $this->objects[$id] = [];
         $this->objects[$id][] = ($view ? $view : $this);
