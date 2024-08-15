@@ -177,9 +177,9 @@ class ActionRegister {
                             if ($value === null) return null;
                             if (is_array($value) && (!Tools::hasStringKeys($value) || Tools::hasMaskedIntegerKeys($value))) {
                                 return array_map(function ($val) use ($class) {
-                                    if (array_key_exists('IClass', $val)) {
+                                    if (is_array($val) && array_key_exists('IClass', $val)) {
                                         $class = $val['IClass'];
-                                    } else if (strpos($val, '<::>')) {
+                                    } else if (is_string($val) && strpos($val, '<::>')) {
                                         $class = substr($val, 0, strpos($val, '<::>'));
                                         $val = substr($val, strpos($val, '<::>') + 4);
                                     }
