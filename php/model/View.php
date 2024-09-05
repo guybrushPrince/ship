@@ -83,11 +83,12 @@ abstract class View extends DirectView {
 
     /**
      * Generates the code safe (with access).
-     * @param boolean $complete Whether with all information or not.
-     * @param boolean $templates Whether with templates or not.
+     * @param bool $complete Whether with all information or not.
+     * @param bool $templates Whether with templates or not.
      * @return string
+     * @throws DatabaseError
      */
-    public function generateSafe($complete = false, $templates = false) : string {
+    public function generateSafe(bool $complete = false, bool $templates = false) : string {
         if ($this->isSafe()) return $this->generate($complete, $templates);
         else return '';
     }
@@ -107,7 +108,7 @@ abstract class View extends DirectView {
             if (!array_key_exists('rights', $_SESSION)) {
                 $user = User::get($_SESSION['user']);
                 if (in_array(SystemRole::SUPERUSER, $user->getSystemRolesList())) {
-                    $_SESSION['rights'] = SunstoneAccessRights::$accessRights;
+                    $_SESSION['rights'] = SunstoneAccessRights::accessRights;
                 } else {
                     $rights = ViewAccessRight::get($_SESSION['group'] . ':' . $_SESSION['role']);
                     if ($rights && $rights instanceof ViewAccessRight) {
@@ -115,6 +116,17 @@ abstract class View extends DirectView {
                     } else {
                         $_SESSION['rights'] = array();
                     }
+                }
+                $roles = array_intersect($user->getSystemRolesList(), array_keys(SunstoneAccessRights::systemRoleRights));
+                if (count($roles) >= 1) {
+                    $rights = [];
+                    foreach ($roles as $role) {
+                        $rights = array_merge(
+                            $rights,
+                            array_intersect($_SESSION['rights'], SunstoneAccessRights::systemRoleRights[$role])
+                        );
+                    }
+                    $_SESSION['rights'] = array_unique($rights);
                 }
             }
             if (count(array_intersect($_SESSION['rights'], $this->access)) > 0) {
@@ -131,13 +143,13 @@ abstract class View extends DirectView {
      * @param bool $force Whether the templates shall be generated even though they were already generated.
      * @return string
      */
-    public abstract function generate($complete = false, $templates = false, $force = false) : string;
+    public abstract function generate(bool $complete = false, bool $templates = false, bool $force = false) : string;
 
     /**
      * Set the language.
-     * @param $language
+     * @param int $language The language.
      */
-    public static function setLanguage($language) {
+    public static function setLanguage(int $language) : void {
         View::$language = $language;
     }
 
