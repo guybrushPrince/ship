@@ -66,14 +66,15 @@ abstract class DirectView {
     /**
      * Set a reference.
      * @param string $id The id.
-     * @param boolean|string $scope The scope (value, attribute, or nothing)
+     * @param bool|string $scope The scope (value, attribute, or nothing)
      * @param View|false $view The view to add.
      * @return $this
      */
-    public function ref($id, $scope = false, $view = false) {
+    public function ref(string $id, bool|string $scope = false, View|bool $view = false) : static {
         $this->references[$id] = array(
             "view"  => ($view ? $view : $this),
-            "scope" => $scope
+            "scope" => $scope,
+            "name" => $id
         );
         if (!$view) $this->names[] = $id;
         return $this;

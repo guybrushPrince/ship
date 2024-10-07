@@ -207,6 +207,12 @@ class ActionRegister {
                                     return self::extractObject($class, $value);
                                 }, $value);
                             }
+                        } else if (is_string($first) && strpos($first, '<::>')) {
+                            return array_map(function ($val) {
+                                $class = substr($val, 0, strpos($val, '<::>'));
+                                $val = substr($val, strpos($val, '<::>') + 4);
+                                return self::extractObject($class, $val);
+                            }, $value);
                         }
                     }
                     return self::unpreserveArrayKeys($value);

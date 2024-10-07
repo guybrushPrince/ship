@@ -206,7 +206,8 @@ abstract class View extends DirectView {
                 $view->uniqueId = $_SESSION['references'][$id];
                 $view = array(
                     "view"  => ($view),
-                    "scope" => false
+                    "scope" => false,
+                    "name"  => $id
                 );
             }
             return $view;
@@ -216,7 +217,7 @@ abstract class View extends DirectView {
     /**
      * @inheritDoc
      */
-    public function ref($id, $scope = false, $view = false) {
+    public function ref(string $id, bool|string $scope = false, View|bool $view = false) : static {
         if (is_object($id)) $id = self::getObjectId($id);
         parent::ref($id, $scope, $view);
         if (!$this->uniqueId) {
