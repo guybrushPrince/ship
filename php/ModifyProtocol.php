@@ -230,6 +230,20 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Disable the views.
+     * @param DirectView|string|TemplateObject $view The given view.
+     * @return $this
+     */
+    public function disable($view) : ModifyProtocol {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "disable",
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
      * Try to set focus on the element.
      * @param DirectView|string $view The given view.
      * @return $this
