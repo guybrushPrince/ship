@@ -13,37 +13,37 @@ abstract class ActionProtocol extends Protocol {
      * The class of the implementation of the modify abstract class.
      * @var string
      */
-    private $implementation;
+    private string $implementation;
 
     /**
      * The controller.
      * @var string
      */
-    protected $controller;
+    protected string $controller;
 
     /**
      * The method.
      * @var string
      */
-    protected $method;
+    protected string $method;
 
     /**
      * An array of parameters.
      * @var array
      */
-    protected $parameters = array();
+    protected array $parameters = [];
 
     /**
      * Title.
      * @var array
      */
-    protected $title;
+    protected array $title;
 
     /**
      * Whether it should use sea star or not.
      * @var bool|int
      */
-    protected $seaStar = false;
+    protected bool|int $seaStar = false;
 
     /**
      * @inheritDoc
@@ -74,7 +74,7 @@ abstract class ActionProtocol extends Protocol {
      * Generate a success branch.
      * @return ModifyProtocol
      */
-    public function success() {
+    public function success() : ModifyProtocol {
         $impl = $this->implementation;
         $obj = new $impl($this);
         $this->protocol[] = array(
@@ -85,10 +85,24 @@ abstract class ActionProtocol extends Protocol {
     }
 
     /**
+     * Generates a fail branch if there was an error that shall be handled.
+     * @return ModifyProtocol
+     */
+    public function fail() : ModifyProtocol {
+        $impl = $this->implementation;
+        $obj = new $impl($this);
+        $this->protocol[] = array(
+            "operation" => "fail",
+            "protocol"  => $obj
+        );
+        return $obj;
+    }
+
+    /**
      * Generate an error branch.
      * @return ModifyProtocol
      */
-    public function error() {
+    public function error() : ModifyProtocol {
         $impl = $this->implementation;
         $obj = new $impl($this);
         $this->protocol[] = array(
@@ -99,10 +113,10 @@ abstract class ActionProtocol extends Protocol {
     }
 
     /**
-     * Generate a eventually branch.
+     * Generate an eventually-branch.
      * @return ModifyProtocol
      */
-    public function eventually() {
+    public function eventually() : ModifyProtocol {
         $impl = $this->implementation;
         $obj = new $impl($this);
         $this->protocol[] = array(

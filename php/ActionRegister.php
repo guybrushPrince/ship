@@ -265,10 +265,23 @@ class ActionRegister {
      * Handle the output of the method.
      * @param Response $response The response.
      * @param ReflectionMethod $method The method.
-     * @param string|bool|array|View|ShipError $retValue
+     * @param string|bool|array|View|ShipError|Fail $retValue
      * @return Response
      */
     private function handleMethodOutput(Response $response, ReflectionMethod $method, $retValue) : Response {
+        if ($retValue instanceof Fail) {
+            $content = $retValue->getContent();
+            if (is_array($content)) {
+                $isViewsArray = count(array_filter($content, function ($val) {
+                    return !($val instanceof View);
+                })) === 0;
+                if ($isViewsArray) $content = $this->serializeView($content);
+            } else if ($content instanceof View) $content = $this->serializeView($content);
+            $retValue = [
+                Fail::INTERN_FAIL => Fail::INTERN_FAIL,
+                "content" => $content
+            ];
+        }
         if (is_string($retValue) || is_string($retValue)) {
             if ($this->isCSV($method)) {
                 $response = $this->setResponse($response, $retValue, 'text/csv');

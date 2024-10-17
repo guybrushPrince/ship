@@ -33,7 +33,7 @@ class MultipleActionProtocol extends ActionProtocol {
     /**
      * @inheritDoc
      */
-    public function success() {
+    public function success() : ModifyProtocol {
         $modifies = [];
         foreach ($this->multiProtocols as $p) $modifies[] = $p->success();
         return new MultipleModifyProtocol($this, $modifies);
@@ -42,7 +42,16 @@ class MultipleActionProtocol extends ActionProtocol {
     /**
      * @inheritDoc
      */
-    public function error() {
+    public function fail() : ModifyProtocol {
+        $modifies = [];
+        foreach ($this->multiProtocols as $p) $modifies[] = $p->fail();
+        return new MultipleModifyProtocol($this, $modifies);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function error() : ModifyProtocol {
         $modifies = [];
         foreach ($this->multiProtocols as $p) $modifies[] = $p->error();
         return new MultipleModifyProtocol($this, $modifies);
@@ -51,7 +60,7 @@ class MultipleActionProtocol extends ActionProtocol {
     /**
      * @inheritDoc
      */
-    public function eventually() {
+    public function eventually() : ModifyProtocol {
         $modifies = [];
         foreach ($this->multiProtocols as $p) $modifies[] = $p->eventually();
         return new MultipleModifyProtocol($this, $modifies);
