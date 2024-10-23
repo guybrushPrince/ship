@@ -282,7 +282,7 @@ class ActionRegister {
                 "content" => $content
             ];
         }
-        if (is_string($retValue) || is_string($retValue)) {
+        if (is_string($retValue)) {
             if ($this->isCSV($method)) {
                 $response = $this->setResponse($response, $retValue, 'text/csv');
                 $response = $response->withHeader('Content-Disposition', 'attachment;filename=survey_data.csv');
@@ -298,9 +298,11 @@ class ActionRegister {
                                      ->withHeader('Expires', '0')
                                      ->withHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
                 readfile($retValue);
-            } else $this->setResponse($response, $retValue, 'text/html');
+            } else if ($this->isZIP($method)) {
+                $response = $this->setResponse($response, HtmlActionProtocol::$serverURL . $retValue, 'text/html');
+            } else $response = $this->setResponse($response, $retValue, 'text/html');
         } else if (is_bool($retValue)) {
-            $this->setResponse($response, simpleJsonEncode($retValue));
+            $response = $this->setResponse($response, simpleJsonEncode($retValue));
         } else if (is_array($retValue)) {
             $isViewsArray = count(array_filter($retValue, function($val) {
                 return !($val instanceof View);
@@ -417,6 +419,10 @@ class ActionRegister {
 
     private function isCSV(ReflectionMethod $method) {
         return $this->isArbitrary($method, 'CSV');
+    }
+
+    private function isZIP(ReflectionMethod $method) {
+        return $this->isArbitrary($method, 'ZIP');
     }
 
     private function isArbitrary(ReflectionMethod $method, $arbitrary) {
