@@ -34,7 +34,7 @@ abstract class ModifyProtocol extends Protocol {
 
     /**
      * Append modify protocol with another.
-     * @param ModifyProtocol|TemplateObject|false $protocol The protocol.
+     * @param ModifyProtocol|TemplateObject|false|null $protocol The protocol.
      * @return $this
      */
     public function append($protocol) : ModifyProtocol {
