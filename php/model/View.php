@@ -268,7 +268,8 @@ abstract class View extends DirectView {
             if (!array_key_exists($id, $_SESSION['objects'])) $_SESSION['objects'][$id] = [];
             $_SESSION['objects'][$id][] = $this->uniqueId;
         }
-        if ($this->parent !== null) $this->parent->bind($object, $event, $protocol, $scope, ($view ? $view : $this));
+        if ($this->parent !== null && $event === null)
+            $this->parent->bind($object, $event, $protocol, $scope, ($view ? $view : $this));
         return $this;
     }
 
