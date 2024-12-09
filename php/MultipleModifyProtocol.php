@@ -241,8 +241,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function openWindow($url, $name, $protocol = null) : ModifyProtocol {
-        foreach ($this->multiProtocols as $p) $p->openWindow($url, $name, $protocol);
+    public function openWindow($url, $name, $protocol = null, $view = null) : ModifyProtocol {
+        foreach ($this->multiProtocols as $p) $p->openWindow($url, $name, $protocol, $view);
         return $this;
     }
 

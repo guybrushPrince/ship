@@ -477,8 +477,8 @@ abstract class ModifyProtocol extends Protocol {
     /**
      * Throw an event on the view.
      * @param int|TemplateObject $event The event.
-     * @param TemplateObject|PersistentTrait $view The view.
-     * @param TemplateObject|string|string[]|null $scopes The scope.
+     * @param TemplateObject|PersistentTrait $object The object.
+     * @param TemplateObject|string|string[]|null $scopes The scopes.
      * @param array|null|TemplateObject $data Some additional data.
      * @return $this
      */
@@ -508,12 +508,43 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Throw an event on the view.
+     * @param DirectView|string|TemplateObject $view The view.
+     * @param int|TemplateObject $event The event.
+     * @param TemplateObject|PersistentTrait $object The object.
+     * @param TemplateObject|string|string[]|null $scopes The scopes.
+     * @return $this
+     */
+    public function unbindObjectEvent($view, $event, $object, $scopes = null) : ModifyProtocol {
+        $view = $this->detectView($view);
+        if ($event instanceof TemplateObject) {
+            $this->addTemplateObject($event);
+        }
+        if ($object instanceof TemplateObject) {
+            $this->addTemplateObject($object);
+        }
+        if ($scopes instanceof TemplateObject) {
+            $this->addTemplateObject($scopes);
+        } else if ($scopes && is_string($scopes)) {
+            $scopes = [ $scopes ];
+        }
+        $this->protocol[] = array(
+            "operation" => "unbindObjectEvent",
+            "view"      => $view,
+            "event"     => $event,
+            "object"    => $object,
+            "scopes"    => $scopes
+        );
+        return $this;
+    }
+
+    /**
      * Opens a new browser popup window with a given url and name.
      * @param string|TemplateObject $url The url.
      * @param string|TemplateObject $name The name of the window.
      * @return $this
      */
-    public function openWindow($url, $name, $protocol = null) : ModifyProtocol {
+    public function openWindow($url, $name, $protocol = null, $view = null) : ModifyProtocol {
         if ($url instanceof TemplateObject) {
             $this->addTemplateObject($url);
         }
@@ -523,11 +554,15 @@ abstract class ModifyProtocol extends Protocol {
         if ($protocol instanceof TemplateObject) {
             $this->addTemplateObject($protocol);
         }
+        if ($view) {
+            $view = $this->detectView($view);
+        }
         $this->protocol[] = array(
             "operation" => "openWindow",
             "url"       => $url,
             "name"      => $name,
-            "protocol"  => $protocol
+            "protocol"  => $protocol,
+            "view"      => $view
         );
         return $this;
     }
