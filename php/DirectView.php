@@ -98,11 +98,12 @@ abstract class DirectView {
      * @param int|null $event The event to react on.
      * @param ModifyProtocol|null $protocol The protocol to execute on the event.
      * @param string|null $scope A possible scope for the event.
+     * @param string[]|null $ignoreData Whether specific data fields shall be ignored, or not.
      * @param DirectView|null $view (internal).
      * @return $this
      */
     public function bind($object, ?int $event = null, ?ModifyProtocol $protocol = null, ?string $scope = null,
-                         ?DirectView $view = null) {
+                         ?array $ignoreData = null, ?DirectView $view = null) : static {
         $id = self::getObjectId($object);
         if (!array_key_exists($id, $this->objects)) $this->objects[$id] = [];
         $this->objects[$id][] = ($view ? $view : $this);

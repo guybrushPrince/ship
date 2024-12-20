@@ -627,7 +627,8 @@ abstract class ModifyProtocol extends Protocol {
         $this->protocol[] = array(
             "operation"  => "event",
             "event"      => $event,
-            "view"      => $view
+            "view"       => $view,
+            "data"       => null
         );
         return $this;
     }

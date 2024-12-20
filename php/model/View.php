@@ -257,11 +257,11 @@ abstract class View extends DirectView {
      * @inheritDoc
      */
     public function bind($object, ?int $event = null, ?ModifyProtocol $protocol = null, ?string $scope = null,
-                         ?DirectView $view = null) {
+                         ?array $ignoreData = null, ?DirectView $view = null) : static{
         if (!$this->uniqueId) {
             $this->uniqueId = $this->generateId();
         }
-        parent::bind($object, $event, $protocol, $scope, $view);
+        parent::bind($object, $event, $protocol, $scope, $ignoreData, $view);
         if (isset($_SESSION)) {
             if (!array_key_exists('objects', $_SESSION)) $_SESSION['objects'] = [];
             $id = self::getObjectId($object);
@@ -269,7 +269,7 @@ abstract class View extends DirectView {
             $_SESSION['objects'][$id][] = $this->uniqueId;
         }
         if ($this->parent !== null && $event === null)
-            $this->parent->bind($object, $event, $protocol, $scope, ($view ? $view : $this));
+            $this->parent->bind($object, $event, $protocol, $scope, $ignoreData, ($view ? $view : $this));
         return $this;
     }
 
