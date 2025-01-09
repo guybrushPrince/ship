@@ -326,10 +326,10 @@ abstract class View extends DirectView {
     /**
      * @see View->addHint
      * @param int $language The language.
-     * @param string|false $hint The hint.
+     * @param string|null $hint The hint.
      * @return $this|string[]
      */
-    public function hint(int $language, $hint = false) {
+    public function hint(int $language, ?string $hint = null) : static|array {
         if ($hint) {
             $this->addHint($language, $hint);
             return $this;
@@ -342,7 +342,7 @@ abstract class View extends DirectView {
      * @param Closure $callback The callback function of type (View, Element, Key)
      * @return $this
      */
-    public function each($array, Closure $callback) : View {
+    public function each($array, Closure $callback) : static {
         if (!is_array($array)) $array = array( $array );
         foreach ($array as $key => $el) {
             $callback($this, $el, $key);
@@ -354,10 +354,10 @@ abstract class View extends DirectView {
      * Append something conditional.
      * @param bool|object $cond A condition.
      * @param Closure $thenCallback The then callback (View).
-     * @param Closure|false $elseCallback The else callback (View).
+     * @param Closure|null $elseCallback The else callback (View).
      * @return $this
      */
-    public function conditional($cond, Closure $thenCallback, $elseCallback = false) : View {
+    public function conditional($cond, Closure $thenCallback, ?Closure $elseCallback = null) : static {
         if ($cond) {
             $thenCallback($this);
         } else {
@@ -372,7 +372,7 @@ abstract class View extends DirectView {
      * @param Closure $callback The callback.
      * @return $this
      */
-    public function self(Closure $callback): View {
+    public function self(Closure $callback) : static {
         $callback($this);
         return $this;
     }
@@ -389,7 +389,7 @@ abstract class View extends DirectView {
      * Forces to set the unique id to the given one.
      * @param string $id The id.
      */
-    public function forceUniqueIdIntern(string $id) {
+    public function forceUniqueIdIntern(string $id) : void {
         $this->uniqueId = $id;
     }
 
