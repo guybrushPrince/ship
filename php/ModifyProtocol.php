@@ -672,6 +672,20 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Just stores a view in the context.
+     * @param $view
+     * @return $this
+     */
+    public function retainView($view) : static {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation"  => "retain",
+            "view"       => $view
+        );
+        return $this;
+    }
+
+    /**
      * Call a template.
      * @param string $name The name of the template.
      * @param array $context A mapping from the template objects to real objects.

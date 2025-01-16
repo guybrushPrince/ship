@@ -175,16 +175,22 @@ class ActionRegister {
 
                         if (!Tools::isScalar($class)) {
                             if ($value === null) return null;
-                            if (is_array($value) && (!Tools::hasStringKeys($value) || Tools::hasMaskedIntegerKeys($value))) {
-                                return array_map(function ($val) use ($class) {
-                                    if (is_array($val) && array_key_exists('IClass', $val)) {
-                                        $class = $val['IClass'];
-                                    } else if (is_string($val) && strpos($val, '<::>')) {
-                                        $class = substr($val, 0, strpos($val, '<::>'));
-                                        $val = substr($val, strpos($val, '<::>') + 4);
-                                    }
-                                    return self::extractObject($class, $val);
-                                }, $value);
+                            if (is_array($value)) {
+                                if ((!Tools::hasStringKeys($value) || Tools::hasMaskedIntegerKeys($value))) {
+                                    return array_map(function ($val) use ($class) {
+                                        if (is_array($val) && array_key_exists('IClass', $val)) {
+                                            $class = $val['IClass'];
+                                        } else if (is_string($val) && strpos($val, '<::>')) {
+                                            $class = substr($val, 0, strpos($val, '<::>'));
+                                            $val = substr($val, strpos($val, '<::>') + 4);
+                                        }
+                                        return self::extractObject($class, $val);
+                                    }, $value);
+                                } else if (array_key_exists('IClass', $value)) {
+                                    $class = $value['IClass'];
+                                    $value = $value['value'];
+                                    return self::extractObject($class, $value);
+                                }
                             }
                             if (array_key_exists($name . 'IClass', $params)) {
                                 $class = $params[$name . 'IClass'];
