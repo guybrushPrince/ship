@@ -290,7 +290,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function reload() : ModifyProtocol {
+    public function reload() : static {
         foreach ($this->multiProtocols as $p) $p->reload();
         return $this;
     }
@@ -298,8 +298,16 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function function ($code) : ModifyProtocol {
+    public function function ($code) : static {
         foreach ($this->multiProtocols as $p) $p->function($code);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function scrollTop(DirectView|string|TemplateObject $view): static {
+        foreach ($this->multiProtocols as $p) $p->scrollTop($view);
         return $this;
     }
 

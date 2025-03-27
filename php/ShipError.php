@@ -6,6 +6,8 @@
  */
 class ShipError extends CliffSerializable {
 
+    use CoastSerializableStandard;
+
     /**
      * The code of the error.
      * @var int

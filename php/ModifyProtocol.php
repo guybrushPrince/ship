@@ -651,7 +651,7 @@ abstract class ModifyProtocol extends Protocol {
      * Reloads the page.
      * @return $this
      */
-    public function reload() : ModifyProtocol {
+    public function reload() : static {
         $this->protocol[] = array(
             "operation"  => "reload"
         );
@@ -663,7 +663,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param string|TemplateObject $code The code.
      * @return $this
      */
-    public function function($code) : ModifyProtocol {
+    public function function($code) : static {
         $this->protocol[] = array(
             "operation"  => "function",
             "code" => $code
@@ -680,6 +680,20 @@ abstract class ModifyProtocol extends Protocol {
         $view = $this->detectView($view);
         $this->protocol[] = array(
             "operation"  => "retain",
+            "view"       => $view
+        );
+        return $this;
+    }
+
+    /**
+     * Scrolls to the top in the view.
+     * @param TemplateObject|string|DirectView $view The view.
+     * @return $this
+     */
+    public function scrollTop(TemplateObject|string|DirectView $view) : static {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation"  => "scrollTop",
             "view"       => $view
         );
         return $this;
