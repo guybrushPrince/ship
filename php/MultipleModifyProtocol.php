@@ -121,6 +121,14 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
+    public function enable($view) : ModifyProtocol {
+        foreach ($this->multiProtocols as $p) $p->enable($view);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function disable($view) : ModifyProtocol {
         foreach ($this->multiProtocols as $p) $p->disable($view);
         return $this;
