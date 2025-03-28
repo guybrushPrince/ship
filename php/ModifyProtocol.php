@@ -230,6 +230,20 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Enable the views.
+     * @param DirectView|string|TemplateObject $view The given view.
+     * @return $this
+     */
+    public function enable($view) : ModifyProtocol {
+        $view = $this->detectView($view);
+        $this->protocol[] = array(
+            "operation" => "enable",
+            "view"      => $view
+        );
+        return $this;
+    }
+
+    /**
      * Disable the views.
      * @param DirectView|string|TemplateObject $view The given view.
      * @return $this
