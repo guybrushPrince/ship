@@ -1,11 +1,19 @@
 <?php
 
-include_once dirname(__FILE__) . '/Protocol.php';
-include_once dirname(__FILE__) . '/ModifyProtocol.php';
+include_once __DIR__ . '/Protocol.php';
+include_once __DIR__ . '/ModifyProtocol.php';
 
 /**
- * Class ActionProtocol
- * Dr. Dipl.-Inf. Thomas M. Prinz
+ * Class ActionProtocol.
+ *
+ * <p>A <i>Ship Protocol</i> (see {@link Protocol}), which calls a server <i>method</i> being
+ * part of a specific <i>controller</i>.</p>
+ *
+ * @package ship
+ * @subpackge php
+ *
+ * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class ActionProtocol extends Protocol {
 
@@ -47,15 +55,16 @@ abstract class ActionProtocol extends Protocol {
 
     /**
      * @inheritDoc
+     * @throws ReflectionException
      */
     public function __construct(
         ModifyProtocol $parent,
-        $controller,
-        $method,
-        $implementation,
-        $parameters = array(),
-        $title = array(),
-        $seaStar = false
+        string $controller,
+        string $method,
+        string $implementation,
+        array $parameters = [],
+        array $title = [],
+        int|bool $seaStar = false
     ) {
         parent::__construct($parent);
         $this->implementation = $implementation;
@@ -126,7 +135,12 @@ abstract class ActionProtocol extends Protocol {
         return $obj;
     }
 
-    private function findHiddenParameters() {
+    /**
+     * Try to find hidden parameters and add them as template objects.
+     * @return void
+     * @throws ReflectionException
+     */
+    private function findHiddenParameters() : void {
         if ($this->seaStar !== SeaStarMethod::EVENT) {
             // Add hidden template objects
             $clazz = new ReflectionClass($this->controller);
