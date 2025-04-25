@@ -1,46 +1,51 @@
 <?php
 
 /**
- * Class Protocol
+ * Class Protocol.
+ *
+ * @package ship
+ * @subpackge php
+ *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class Protocol {
 
     /**
-     * The protocol.
+     * The protocol(s)/action(s) to be performed.
      * @var array
      */
-    protected $protocol = array();
+    protected array $protocol = [];
 
     /**
-     * The parent protocol
-     * @var Protocol|DirectView
+     * The parent protocol or parent view this protocol belongs to.
+     * @var Protocol|DirectView|null
      */
-    protected $parent = null;
+    protected Protocol|DirectView|null $parent = null;
 
     /**
-     * The children.
-     * @var array
+     * The children protocols.
+     * @var Protocol[]
      */
-    protected $children = array();
+    protected array $children = [];
 
     /**
-     * An array of used template objects.
-     * @var array
+     * An array of used template objects within the protocol.
+     * @var TemplateObject[]
      */
-    protected $templateObjects = array();
+    protected array $templateObjects = [];
 
     /**
-     * An array of all collected template objects (recursively).
-     * @var array|bool
+     * An array of all collected template objects (recursively). (Just for computation!)
+     * @var array|null
      */
-    protected $allTemplateObjects = false;
+    private ?array $unsetParameters = null;
 
     /**
-     * Protocol constructor.
-     * @param Protocol|DirectView $parent
+     * Constructor.
+     * @param Protocol|DirectView|null $parent The parent protocol or view.
      */
-    public function __construct($parent) {
+    public function __construct(Protocol|DirectView|null $parent) {
         if ($parent instanceof Protocol) {
             $parent->children[] = $this;
         }
@@ -51,37 +56,40 @@ abstract class Protocol {
      * Generates the code for the protocol.
      * @return string
      */
-    public abstract function generate(): string;
+    public abstract function generate() : string;
 
     /**
-     * Set the parent.
+     * Sets the parent protocol or view.
      * @param DirectView|Protocol $parent The parent.
+     * @return void
      */
-    protected function setParent($parent) {
+    protected function setParent(DirectView|Protocol $parent) : void {
         $this->parent = $parent;
     }
 
     /**
      * Get the template objects.
-     * @return array
+     * @return TemplateObject[]
      */
-    public function getTemplateObjects() {
+    public function getTemplateObjects() : array {
         return $this->templateObjects;
     }
 
     /**
      * Set the template objects.
-     * @param array $templateObjects The objects.
+     * @param TemplateObject[] $templateObjects The template objects.
+     * @return void
      */
-    public function setTemplateObjects($templateObjects) {
+    public function setTemplateObjects(array $templateObjects) : void {
         $this->templateObjects = $templateObjects;
     }
 
     /**
      * Add a template object.
-     * @param TemplateObject $object The object.
+     * @param TemplateObject $object The template object.
+     * @return void
      */
-    public function addTemplateObject(TemplateObject $object) {
+    public function addTemplateObject(TemplateObject $object) : void {
         $this->templateObjects[] = $object;
     }
 
@@ -89,48 +97,58 @@ abstract class Protocol {
      * Collects the parameter templates with the protocol (and its children).
      * @return array
      */
-    public function collectParameters() {
-        if (!$this->allTemplateObjects) {
-            $this->allTemplateObjects = Tools::unique(array_merge($this->getTemplateObjects(),
-                $this->collectParametersInArray($this->protocol)));
+    public function collectParameters() : array {
+        if (!$this->unsetParameters) {
+            $this->unsetParameters = Tools::unique(
+                array_merge(
+                    $this->getTemplateObjects(),
+                    $this->collectParametersInArray($this->protocol)
+                )
+            );
         }
-        return $this->allTemplateObjects;
+        return $this->unsetParameters;
     }
 
     /**
      * Collect the parameters within an array recursively.
-     * @param array $parameters
+     * @param array $parameters The protocol representation.
      * @return array
      */
-    private function collectParametersInArray(array $parameters) {
-        return Tools::flatten(array_filter(array_map(function($param) {
-            if ($param instanceof TemplateObject) return $param;
-            else if ($param instanceof JSFunction) return $param;
-            else if (is_array($param)) return $this->collectParametersInArray($param);
-            else if ($param instanceof Protocol) return $param->collectParameters();
-            return false;
-        }, $parameters), function($param) {
-            return $param ? true : false;
-        }));
+    private function collectParametersInArray(array $parameters) : array {
+        return Tools::flatten(
+            array_filter(
+                array_map(function($param) {
+                    if ($param instanceof TemplateObject) return $param;
+                    else if ($param instanceof JSFunction) return $param;
+                    else if (is_array($param)) return $this->collectParametersInArray($param);
+                    else if ($param instanceof Protocol) return $param->collectParameters();
+                    return false;
+                }, $parameters),
+                function($param) {
+                    return (bool) $param;
+                }
+            )
+        );
     }
 
 
-
-    // Short cuts.
+    //////////////////////////
+    // Shortcuts
+    //////////////////////////
 
     /**
-     * Return the parent.
-     * @return Protocol|DirectView
+     * Get the parent.
+     * @return Protocol|DirectView|null
      */
-    public function parent() {
+    public function parent() : Protocol|DirectView|null {
         return $this->parent;
     }
 
     /**
-     * The inner view.
-     * @return DirectView
+     * Determine the view that is connected to this protocol (if any).
+     * @return DirectView|null
      */
-    public function innerView() {
+    public function innerView() : ?DirectView {
         if ($this->parent instanceof DirectView) {
             return $this->parent;
         } else if ($this->parent === null) {

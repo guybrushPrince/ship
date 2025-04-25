@@ -1,13 +1,18 @@
 <?php
 
 /**
- * Class DialogProtocol
+ * Class DialogProtocol.
+ *
+ * @package ship
+ * @subpackge php
+ *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class DialogProtocol extends Protocol {
 
     /**
-     * The class of the implementation of the modify abstract class.
+     * The class name of the implementation of this class.
      * @var string
      */
     private string $implementation;
@@ -19,24 +24,20 @@ abstract class DialogProtocol extends Protocol {
     protected array $options;
 
     /**
-     * The texts.
-     * @var array
+     * The texts indexed by the language.
+     * @var string[]
      */
     protected array $texts;
 
     /**
      * DialogProtocol constructor.
      * @param ModifyProtocol $parent The parent protocol.
-     * @param array $texts The texts of the dialog.
+     * @param string[] $texts The texts of the dialog.
      * @param array|null $options The available options.
-     * @param string $implementation
+     * @param string $implementation The class name of the implementation.
      */
-    public function __construct(
-        ModifyProtocol $parent,
-        array $texts,
-        ?array $options = null,
-        $implementation = "DialogProtocol"
-    ) {
+    public function __construct(ModifyProtocol $parent, array $texts, ?array $options = null,
+                                string $implementation = "DialogProtocol") {
         parent::__construct($parent);
         $this->implementation = $implementation;
         if ($options === null) {

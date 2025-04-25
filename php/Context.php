@@ -1,27 +1,35 @@
 <?php
 
 /**
- * Class Context
+ * Class Context.
+ * An implementation-unspecific version of a context consisting of fields for representing
+ * context variables (fields).
+ *
+ * @package ship
+ * @subpackge php
+ *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class Context {
 
     /**
-     * An array with contexts.
-     * @var array
+     * A static array with contexts indexed by field names (string).
+     * @var Context[]
      */
-    private static $contexts = array();
+    private static array $contexts = [];
 
     /**
+     * THe field of the context.
      * @var string
      */
-    protected $field;
+    protected string $field;
 
     /**
      * Context constructor.
      * @param string $field The name of the field
      */
-    private function __construct($field) {
+    private function __construct(string $field) {
         $this->field = $field;
     }
 
@@ -31,7 +39,7 @@ abstract class Context {
      * @param string $clazz The implementation.
      * @return Context
      */
-    protected static function get($field, $clazz) {
+    protected static function get(string $field, string $clazz) : Context {
         if (!array_key_exists($field, Context::$contexts)) {
             Context::$contexts[$field] = new $clazz($field);
         }
@@ -42,7 +50,7 @@ abstract class Context {
      * Generate code for the context.
      * @return string
      */
-    public abstract function generate();
+    public abstract function generate() : string;
 
 }
 ?>

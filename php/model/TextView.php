@@ -3,16 +3,21 @@
 include_once dirname(__FILE__) . '/View.php';
 
 /**
- * Class TextView
+ * Class TextView.
+ *
+ * @package ship
+ * @subpackge php/model
+ *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 class TextView extends View {
 
     /**
-     * The texts in an associative array.
+     * The texts in an associative array (indexed by the language).
      * @var string[]
      */
-    protected array $texts = array();
+    protected array $texts = [];
 
     /**
      * @inheritDoc
@@ -28,26 +33,31 @@ class TextView extends View {
     /**
      * @inheritDoc
      */
-    public function add(View $view) : View { return $this; }
+    public function add(View $view) : View {
+        return $this;
+    }
 
     /**
      * Add a text.
      * @param int $language The language.
      * @param string $text The text.
+     * @return void
      */
-    public function addText(int $language, string $text) {
+    public function addText(int $language, string $text) : void {
         $this->texts[$language] = $text;
     }
 
+    //////////////////////////
     // Shortcuts
+    //////////////////////////
 
     /**
      * @see TextView->addText
      * @param int $language The language.
      * @param string|null $text The text.
-     * @return TextView
+     * @return $this
      */
-    public function text(int $language, ?string $text) {
+    public function text(int $language, ?string $text) : static {
         if ($text === null) $text = '';
         $this->addText($language, Tools::maskTypical($text));
         return $this;
@@ -56,12 +66,11 @@ class TextView extends View {
     /**
      * @inheritDoc
      */
-    public function protocol(int $event, array $params = []) {
+    public function protocol(int $event, array $params = []) : ?ModifyProtocol {
         if ($this->parent() instanceof HtmlView) {
             $pro = new HtmlEventProtocol($event, $this, $params);
             $this->protocols[] = $pro;
-            $pro = $pro->modify();
-            return $pro;
+            return $pro->modify();
         } else {
             return null;
         }
@@ -70,12 +79,11 @@ class TextView extends View {
     /**
      * @inheritDoc
      */
-    public function firstProtocol(int $event, array $params = []) {
+    public function firstProtocol(int $event, array $params = []) : ?ModifyProtocol {
         if ($this->parent() instanceof HtmlView) {
             $pro = new HtmlEventProtocol($event, $this, $params);
             array_unshift($this->protocols, $pro);
-            $pro = $pro->modify();
-            return $pro;
+            return $pro->modify();
         } else {
             return null;
         }
@@ -85,7 +93,7 @@ class TextView extends View {
      * Return a new text view.
      * @return TextView
      */
-    public static function _new() {
+    public static function _new() : TextView {
         return new TextView();
     }
 
@@ -93,7 +101,7 @@ class TextView extends View {
      * Return the id class for html.
      * @return string
      */
-    public function idc() {
+    public function idc() : string {
         if (!$this->uniqueId) $this->uniqueId = $this->generateId();
         return '.' . $this->id();
     }

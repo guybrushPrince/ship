@@ -11,6 +11,9 @@
  */
 class Fail {
 
+    /**
+     * A constant identifying a fail in an array.
+     */
     public const INTERN_FAIL = '__intern_fail';
 
     /**

@@ -1,7 +1,13 @@
 <?php
+
 /**
- * Class TemplateObject
+ * Class TemplateObject.
+ *
+ * @package ship
+ * @subpackge php
+ *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 class TemplateObject {
 
@@ -24,8 +30,9 @@ class TemplateObject {
     private bool $isView = false;
 
     /**
-     * TemplateObject constructor.
+     * Constructor.
      * @param string $name The name.
+     * @param bool $asIs If the value shall be taken as it is, or not.
      */
     private function __construct(string $name, bool $asIs = false) {
         $this->name = $name;

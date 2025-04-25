@@ -1,8 +1,13 @@
 <?php
 
 /**
- * Interface EventAdder
+ * Interface EventAdder.
+ *
+ * @package ship
+ * @subpackge php
+ *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 interface EventAdder {
 

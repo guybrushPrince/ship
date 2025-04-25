@@ -4,8 +4,13 @@ include_once dirname(__FILE__) . '/Protocol.php';
 include_once dirname(__FILE__) . '/ModifyProtocol.php';
 
 /**
- * Class BooleanProtocol
- * Dr. Dipl.-Inf. Thomas M. Prinz
+ * Class BooleanProtocol.
+ *
+ * @package ship
+ * @subpackge php
+ *
+ * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class BooleanProtocol extends Protocol {
 
@@ -13,22 +18,24 @@ abstract class BooleanProtocol extends Protocol {
      * The class of the implementation of this abstract class.
      * @var string
      */
-    private $implementation;
+    private string $implementation;
 
     /**
-     * @inheritDoc
+     * Constructor.
+     * @param ModifyProtocol $parent The parent protocol.
+     * @param string $implementation The specific implementation class name of this protocol.
      */
-    public function __construct(ModifyProtocol $parent, $implementation) {
+    public function __construct(ModifyProtocol $parent, string $implementation) {
         parent::__construct($parent);
-        $this->implementation;
+        $this->implementation = $implementation;
     }
 
     /**
      * Generate an and.
-     * @param boolean $negated Negate the whole.
+     * @param bool $negated Negate the whole.
      * @return BooleanProtocol
      */
-    public function _and($negated = false) {
+    public function _and(bool$negated = false) : BooleanProtocol {
         $this->protocol[] = array(
             "operation" => "and",
             "negated"   => $negated
@@ -39,10 +46,10 @@ abstract class BooleanProtocol extends Protocol {
 
     /**
      * Generate an or.
-     * @param boolean $negated Negate the whole.
+     * @param bool $negated Negate the whole.
      * @return BooleanProtocol
      */
-    public function _or($negated = false) {
+    public function _or(bool $negated = false) : BooleanProtocol {
         $this->protocol[] = array(
             "operation" => "or",
             "negated"   => $negated
@@ -56,7 +63,7 @@ abstract class BooleanProtocol extends Protocol {
      * @param boolean $negated Negate the whole.
      * @return BooleanProtocol
      */
-    public function axiom($negated = false) {
+    public function axiom(bool $negated = false) : BooleanProtocol {
         $this->protocol[] = array(
             "operation" => "axiom",
             "negated"   => $negated

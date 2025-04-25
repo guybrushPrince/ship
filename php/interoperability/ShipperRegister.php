@@ -53,5 +53,45 @@ class ShipperRegister {
         if (is_null(self::$shipper)) return get_class($shippable);
         else return self::$shipper->getClass($shippable);
     }
+
+    /**
+     * Get a shippable object with a specific class and key.
+     * @param string $class The class of the object.
+     * @param string|int|array $key The key of the object.
+     * @return IShippable|null
+     */
+    public static function getObject(string $class, string|int|array $key) : ?IShippable {
+        if (is_null(self::$shipper))
+            throw new Error('Please register an implementation of an AShipper.');
+        return self::$shipper->getObject($class, $key);
+    }
+
+    /**
+     * Get the object reference serialized to a string.
+     * @param IShippable $object The object string.
+     * @return string
+     */
+    public static function getObjectString(IShippable $object) : string {
+        return self::$shipper->getClass($object) . '<::>' .
+            self::convertKey(self::$shipper->getKey($object));
+    }
+
+    /**
+     * Convert the key
+     * @param string|int $value The value / key.
+     * @return string
+     */
+    public static function convertKey(string|int $value) : string {
+        return base_convert($value, 10, 36);
+    }
+
+    /**
+     * Reconvert the key.
+     * @param string|int $value The value / key.
+     * @return string
+     */
+    public static function deConvertKey(string|int $value) : string {
+        return base_convert($value, 36, 10);
+    }
 }
 ?>

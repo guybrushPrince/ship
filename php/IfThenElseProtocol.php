@@ -5,27 +5,36 @@ include_once dirname(__FILE__) . '/ModifyProtocol.php';
 include_once dirname(__FILE__) . '/BooleanProtocol.php';
 
 /**
- * Class IfThenElseProtocol
- * Dr. Dipl.-Inf. Thomas M. Prinz
+ * Class IfThenElseProtocol.
+ *
+ * @package ship
+ * @subpackge php
+ *
+ * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class IfThenElseProtocol extends Protocol {
 
     /**
-     * The class of the implementation of the modify abstract class.
+     * The class name of the implementation of {@link ModifyProtocol}.
      * @var string
      */
-    private $modifyImplementation;
+    private string $modifyImplementation;
 
     /**
-     * The class of the implementation of the condition abstract class.
+     * The class name of the implementation of {@link BooleanProtocol}.
      * @var string
      */
-    private $conditionImplementation;
+    private string $conditionImplementation;
 
     /**
-     * @inheritDoc
+     * Constructor.
+     * @param ModifyProtocol $parent The parent protocol.
+     * @param string $modifyImplementation The implementation class name of {@link ModifyProtocol}.
+     * @param string $conditionImplementation The implementation class name of {@link BooleanProtocol}.
      */
-    public function __construct(ModifyProtocol $parent, $modifyImplementation, $conditionImplementation) {
+    public function __construct(ModifyProtocol $parent, string $modifyImplementation,
+                                string $conditionImplementation) {
         parent::__construct($parent);
         $this->modifyImplementation = $modifyImplementation;
         $this->conditionImplementation = $conditionImplementation;
@@ -35,7 +44,7 @@ abstract class IfThenElseProtocol extends Protocol {
      * Generate a condition branch.
      * @return BooleanProtocol
      */
-    public function cond() {
+    public function cond() : BooleanProtocol {
         $this->protocol[] = array(
             "operation" => "if"
         );
@@ -47,7 +56,7 @@ abstract class IfThenElseProtocol extends Protocol {
      * Generate a then branch.
      * @return ModifyProtocol
      */
-    public function then() {
+    public function then() : ModifyProtocol {
         $this->protocol[] = array(
             "operation" => "then"
         );
@@ -59,7 +68,7 @@ abstract class IfThenElseProtocol extends Protocol {
      * Generate an else branch.
      * @return ModifyProtocol
      */
-    public function _else() {
+    public function _else() : ModifyProtocol {
         $this->protocol[] = array(
             "operation" => "else"
         );

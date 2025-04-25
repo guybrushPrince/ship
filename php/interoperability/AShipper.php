@@ -32,5 +32,13 @@ abstract class AShipper {
         return get_class($shippable);
     }
 
+    /**
+     * Get a shippable object with a specific class and key.
+     * @param string $class The class of the object.
+     * @param string|int|array $key The key of the object.
+     * @return IShippable|null
+     */
+    public abstract function getObject(string $class, string|int|array $key) : ?IShippable;
+
 }
 ?>

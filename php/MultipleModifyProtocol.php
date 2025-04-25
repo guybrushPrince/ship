@@ -33,7 +33,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function append($protocol) : ModifyProtocol {
+    public function append($protocol) : static {
         foreach ($this->multiProtocols as $p) $p->append($protocol);
         return $this;
     }
@@ -41,7 +41,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function set(string $var, $new = false, $scope = false) : ModifyProtocol {
+    public function set(string $var, $new = false, $scope = false) : static {
         foreach ($this->multiProtocols as $p) $p->set($var, $new, $scope);
         return $this;
     }
@@ -49,7 +49,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function setCookie($new = false) : ModifyProtocol {
+    public function setCookie(?string $new = null) : static {
         foreach ($this->multiProtocols as $p) $p->setCookie($new);
         return $this;
     }
@@ -57,7 +57,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function get(string $var) : ModifyProtocol {
+    public function get(string $var) : static {
         foreach ($this->multiProtocols as $p) $p->get($var);
         return $this;
     }
@@ -65,7 +65,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function add($view, $new = false) : ModifyProtocol {
+    public function add(DirectView|TemplateObject|array|string $view,
+                        DirectView|TemplateObject|string|null|false $new = false) : static {
         foreach ($this->multiProtocols as $p) $p->add($view, $new);
         return $this;
     }
@@ -73,7 +74,9 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function addWithFallback($view, $fallback, $new = false) : ModifyProtocol {
+    public function addWithFallback(DirectView|TemplateObject|array|string $view,
+                                    DirectView|TemplateObject|array|string $fallback,
+                                    DirectView|TemplateObject|string|null|false $new = false) : static {
         foreach ($this->multiProtocols as $p) $p->addWithFallback($view, $fallback, $new);
         return $this;
     }
@@ -81,7 +84,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function prepend($view, $new = false) : ModifyProtocol {
+    public function prepend(DirectView|TemplateObject|array|string $view,
+                            DirectView|TemplateObject|string|null|false $new = false) : static {
         foreach ($this->multiProtocols as $p) $p->prepend($view, $new);
         return $this;
     }
@@ -89,7 +93,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function text($view, $text = false) : ModifyProtocol {
+    public function text(DirectView|TemplateObject|array|string $view,
+                         Closure|string|null $text = null) : static {
         foreach ($this->multiProtocols as $p) $p->text($view, $text);
         return $this;
     }
@@ -97,7 +102,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function value($view, $value = false) : ModifyProtocol {
+    public function value(DirectView|TemplateObject|array|string $view,
+                          IShippable|TemplateObject|string|bool|int|float|null $value = null) : static {
         foreach ($this->multiProtocols as $p) $p->value($view, $value);
         return $this;
     }
@@ -105,7 +111,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function resize($view) : ModifyProtocol {
+    public function resize(DirectView|TemplateObject|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->resize($view);
         return $this;
     }
@@ -113,7 +119,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function makeEmpty($view) : ModifyProtocol {
+    public function makeEmpty(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->makeEmpty($view);
         return $this;
     }
@@ -121,7 +127,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function enable($view) : ModifyProtocol {
+    public function enable(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->enable($view);
         return $this;
     }
@@ -129,7 +135,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function disable($view) : ModifyProtocol {
+    public function disable(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->disable($view);
         return $this;
     }
@@ -137,7 +143,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function focus($view) : ModifyProtocol {
+    public function focus(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->focus($view);
         return $this;
     }
@@ -145,7 +151,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function reheight($view) : ModifyProtocol {
+    public function reheight(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->reheight($view);
         return $this;
     }
@@ -153,7 +159,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function reset($view) : ModifyProtocol {
+    public function reset(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->reset($view);
         return $this;
     }
@@ -161,7 +167,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function after($view, $new = false) : ModifyProtocol {
+    public function after(DirectView|TemplateObject|array|string $view,
+                          DirectView|TemplateObject|string|null|false $new = false) : static {
         foreach ($this->multiProtocols as $p) $p->after($view, $new);
         return $this;
     }
@@ -169,7 +176,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function before($view, $new = false) : ModifyProtocol {
+    public function before(DirectView|TemplateObject|array|string $view,
+                           DirectView|TemplateObject|string|null|false $new = false) : static {
         foreach ($this->multiProtocols as $p) $p->before($view, $new);
         return $this;
     }
@@ -177,7 +185,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function replace($view, $new = false) : ModifyProtocol {
+    public function replace(DirectView|TemplateObject|array|string $view,
+                            DirectView|TemplateObject|string|null|false $new = false) : static {
         foreach ($this->multiProtocols as $p) $p->replace($view, $new);
         return $this;
     }
@@ -185,7 +194,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function clear($view) : ModifyProtocol {
+    public function clear(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->clear($view);
         return $this;
     }
@@ -193,7 +202,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function addClass($view, $clazz) : ModifyProtocol {
+    public function addClass(DirectView|TemplateObject|array|string $view,
+                             TemplateObject|array|string $clazz) : static {
         foreach ($this->multiProtocols as $p) $p->addClass($view, $clazz);
         return $this;
     }
@@ -201,7 +211,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function removeClass($view, $clazz) : ModifyProtocol {
+    public function removeClass(DirectView|TemplateObject|array|string $view,
+                                TemplateObject|array|string $clazz) : static {
         foreach ($this->multiProtocols as $p) $p->removeClass($view, $clazz);
         return $this;
     }
@@ -209,7 +220,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function removeClassSiblings($view, $clazz) : ModifyProtocol {
+    public function removeClassSiblings(DirectView|TemplateObject|array|string $view,
+                                        TemplateObject|array|string $clazz) : static {
         foreach ($this->multiProtocols as $p) $p->removeClassSiblings($view, $clazz);
         return $this;
     }
@@ -217,7 +229,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function toggleClass($view, $clazz) : ModifyProtocol {
+    public function toggleClass(DirectView|TemplateObject|array|string|null $view,
+                                TemplateObject|array|string $clazz) : static {
         foreach ($this->multiProtocols as $p) $p->toggleClass($view, $clazz);
         return $this;
     }
@@ -225,7 +238,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function delete($view) : ModifyProtocol {
+    public function delete(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->delete($view);
         return $this;
     }
@@ -233,7 +246,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function throwevent($event, $view, $data = false) : ModifyProtocol {
+    public function throwevent(TemplateObject|int $event, DirectView|TemplateObject|array|string $view,
+                               TemplateObject|array|null $data = null) : static {
         foreach ($this->multiProtocols as $p) $p->throwevent($event, $view, $data);
         return $this;
     }
@@ -241,7 +255,9 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function throwObjectEvent($event, $object, $scopes = null, $data = null) : ModifyProtocol {
+    public function throwObjectEvent(TemplateObject|int $event, TemplateObject|IShippable|array $object,
+                                     TemplateObject|array|string|null $scopes = null,
+                                     TemplateObject|array|null $data = null) : static {
         foreach ($this->multiProtocols as $p) $p->throwObjectEvent($event, $object, $scopes, $data);
         return $this;
     }
@@ -249,13 +265,11 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function openWindow($url, $name, $protocol = null, $view = null) : ModifyProtocol {
+    public function openWindow(TemplateObject|string $url, TemplateObject|string $name,
+                               ?TemplateObject $protocol = null,
+                               DirectView|TemplateObject|array|string|null $view = null) : static {
         foreach ($this->multiProtocols as $p) $p->openWindow($url, $name, $protocol, $view);
         return $this;
-    }
-
-    public function modify() {
-        parent::modify();
     }
 
     /**
@@ -264,7 +278,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     public function action(string $controller, string $name, array $parameters = [], array $title = [
         Language::ENGLISH => 'New Task',
         Language::GERMAN => 'Neue Aktion'
-    ], $seaStar = false) : ActionProtocol {
+    ], int|bool $seaStar = false) : ActionProtocol {
         $actions = [];
         foreach ($this->multiProtocols as $p) $actions[] = $p->action($controller, $name, $parameters, $title, $seaStar);
         return new MultipleActionProtocol($this->parent, $actions);
@@ -282,7 +296,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function event(int $event, $view) : ModifyProtocol {
+    public function event(TemplateObject|int $event, DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->event($event, $view);
         return $this;
     }
@@ -290,7 +304,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function mousePosition($view) : ModifyProtocol {
+    public function mousePosition(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->mousePosition($view);
         return $this;
     }
@@ -306,7 +320,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function function ($code) : static {
+    public function function(TemplateObject|string $code) : static {
         foreach ($this->multiProtocols as $p) $p->function($code);
         return $this;
     }
@@ -314,7 +328,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function scrollTop(DirectView|string|TemplateObject $view): static {
+    public function scrollTop(DirectView|TemplateObject|array|string $view) : static {
         foreach ($this->multiProtocols as $p) $p->scrollTop($view);
         return $this;
     }
@@ -322,7 +336,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function doIt(string $name, array $context = [], string $environment = 'global') : ModifyProtocol {
+    public function doIt(string $name, array $context = [], string $environment = 'global') : static {
         foreach ($this->multiProtocols as $p) $p->doIt($name, $context, $environment);
         return $this;
     }
@@ -330,7 +344,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function gc() : ModifyProtocol {
+    public function gc() : static {
         foreach ($this->multiProtocols as $p) $p->gc();
         return $this;
     }
@@ -338,7 +352,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    protected function detectView($view) {
+    protected function detectView(DirectView|TemplateObject|IShippable|array|string|null|false $view) :
+        DirectView|array|string|TemplateObject|ModifyProtocol|null|false {
         foreach ($this->multiProtocols as $p) $p->detectView($view);
         return $this;
     }
@@ -346,7 +361,7 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
-    public function parent() {
+    public function parent() : DirectView|Protocol|null {
         return $this->parent;
     }
 

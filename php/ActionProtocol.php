@@ -43,7 +43,7 @@ abstract class ActionProtocol extends Protocol {
 
     /**
      * Title.
-     * @var array
+     * @var string[]
      */
     protected array $title;
 
@@ -54,7 +54,14 @@ abstract class ActionProtocol extends Protocol {
     protected bool|int $seaStar = false;
 
     /**
-     * @inheritDoc
+     * Constructor.
+     * @param ModifyProtocol $parent The parent protocol.
+     * @param string $controller The controller class name.
+     * @param string $method The controller method to invoke.
+     * @param string $implementation The specific implementation class name of this protocol.
+     * @param array $parameters The parameter set of the action.
+     * @param string[] $title The title being represented during performing the action.
+     * @param int|bool $seaStar A flag, which states if sea star is used, or not.
      * @throws ReflectionException
      */
     public function __construct(

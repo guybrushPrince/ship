@@ -230,41 +230,16 @@ class ActionRegister {
     /**
      * Tries to extract an object from the database.
      * @param string $class The class.
-     * @param string|int $value The value.
-     * @return object|null
+     * @param string|int|array $value The value.
+     * @return IShippable|View|null
      */
-    private static function extractObject(string $class, $value) : ?object {
+    private static function extractObject(string $class, $value) : IShippable|View|null {
         if ($class === 'HtmlView') {
             $view = new HtmlView();
             $view->forceUniqueIdIntern(substr($value, 2));
             return $view;
         }
-        $keyBinding = $class::getKeyBinding();
-        if (is_array($value) && array_key_exists('value', $value)) $value = $value['value'];
-        $key = ($keyBinding === 'i' ? self::deConvertKey($value) : $value);
-        $val =  call_user_func($class . '::get',
-            ($keyBinding === 'i' ? intval($key) : $key)
-        );
-        if (!$val) return null;
-        return $val;
-    }
-
-    /**
-     * Convert the key
-     * @param string|integer $value The value / key.
-     * @return string
-     */
-    public static function convertKey($value) : string {
-        return base_convert($value, 10, 36);
-    }
-
-    /**
-     * Deconvert the key.
-     * @param string|integer $value The value / key.
-     * @return string
-     */
-    public static function deConvertKey($value) : string {
-        return base_convert($value, 36, 10);
+        return ShipperRegister::getObject($class, $value);
     }
 
     /**

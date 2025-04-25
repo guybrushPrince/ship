@@ -5,9 +5,13 @@ include_once dirname(__FILE__) . '/../ActionRegister.php';
 include_once dirname(__FILE__) . '/access/ViewAccessRight.php';
 
 /**
- * Class View
+ * Class View.
+ *
+ * @package ship
+ * @subpackge php
  *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class View extends DirectView {
 
@@ -19,33 +23,33 @@ abstract class View extends DirectView {
 
     /**
      * The current language.
-     * @var integer
+     * @var int
      */
     protected static int $language = Language::GERMAN;
 
     /**
      * The parent view of this view.
-     * @var ?View
+     * @var View|null
      */
     protected ?View $parent = null;
 
     /**
-     * An array of hints.
-     * @var array
+     * An array of hints (separated by a language as index).
+     * @var string[][]
      */
-    protected array $hints = array();
+    protected array $hints = [];
 
     /**
      * The unique id of the view.
-     * @var string|boolean
+     * @var string|null
      */
-    protected $uniqueId = false;
+    protected ?string $uniqueId = null;
 
     /**
-     * Which access must be granted.
-     * @var array
+     * Which access-strings must be available to show this view.
+     * @var string[]
      */
-    protected array $access = array();
+    protected array $access = [];
 
     /**
      * View constructor.
@@ -54,12 +58,11 @@ abstract class View extends DirectView {
 
     /**
      * Generates a unique id.
-     * @return bool|string
+     * @return string
      */
     protected function generateId() : string {
         return base_convert(rand(), 10, 36);
     }
-
 
     /**
      * The view.
@@ -69,22 +72,24 @@ abstract class View extends DirectView {
     public function add(View $view) : View {
         $this->subviews[] = $view;
         $view->parent = $this;
-        foreach ($view->references as $name => $info) $this->ref($name, $info["scope"], $info["view"]);
+        foreach ($view->references as $name => $info) {
+            $this->ref($name, $info["scope"], $info["view"]);
+        }
         return $view;
     }
 
     /**
      * @inheritDoc
      */
-    public function access($access) : View {
-        $this->access = (is_array($access) ? $access : array( $access ));
+    public function access(string|array $access) : static {
+        $this->access = (is_array($access) ? $access : [ $access ]);
         return $this;
     }
 
     /**
      * Generates the code safe (with access).
-     * @param bool $complete Whether with all information or not.
-     * @param bool $templates Whether with templates or not.
+     * @param bool $complete Whether with all information (eg. CSS, JS, etc.), or not.
+     * @param bool $templates Whether with templates, or not.
      * @return string
      * @throws DatabaseError
      */
@@ -94,7 +99,7 @@ abstract class View extends DirectView {
     }
 
     /**
-     * Checks whether it is safe or not.
+     * Checks whether it is safe to give access to this view, or not.
      * @return bool
      * @throws DatabaseError
      */
@@ -114,7 +119,7 @@ abstract class View extends DirectView {
                     if ($rights && $rights instanceof ViewAccessRight) {
                         $_SESSION['rights'] = $rights->getRightsList();
                     } else {
-                        $_SESSION['rights'] = array();
+                        $_SESSION['rights'] = [];
                     }
                 }
                 $roles = array_intersect($user->getSystemRolesList(), array_keys(SunstoneAccessRights::systemRoleRights));
@@ -138,8 +143,8 @@ abstract class View extends DirectView {
 
     /**
      * Generate code.
-     * @param bool $complete Whether with all information or not.
-     * @param bool $templates Whether with templates or not.
+     * @param bool $complete Whether with all information (eg, CSS, JS, ...), or not.
+     * @param bool $templates Whether with templates, or not.
      * @param bool $force Whether the templates shall be generated even though they were already generated.
      * @return string
      */
@@ -162,7 +167,7 @@ abstract class View extends DirectView {
 
     /**
      * Get the parent view.
-     * @return ?View
+     * @return View|null
      */
     public function getParent() : ?View {
         return $this->parent;
@@ -170,7 +175,7 @@ abstract class View extends DirectView {
 
     /**
      * Determine the uppermost parent view.
-     * @return ?View
+     * @return View|null
      */
     public function getRoot() : ?View {
         $parent = $this->parent;
@@ -182,19 +187,21 @@ abstract class View extends DirectView {
     }
 
     /**
-     * Add an hint.
+     * Adds a hint.
      * @param int $language The language.
      * @param string $hint The hint.
+     * @return $this
      */
-    public function addHint(int $language, string $hint) {
+    public function addHint(int $language, string $hint) : static {
         if (!array_key_exists($language, $this->hints)) $this->hints[$language] = array();
         $this->hints[$language][] = $hint;
+        return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function get($id, $lastChance = false) {
+    public function get(string $id, bool $lastChance = false) : ?array {
         $view = parent::get($id);
         if ($view) return $view;
         if ($view === null && $this->parent !== null) {
@@ -204,11 +211,11 @@ abstract class View extends DirectView {
                 array_key_exists($id, $_SESSION['references'])) {
                 $view = new TextView();
                 $view->uniqueId = $_SESSION['references'][$id];
-                $view = array(
-                    "view"  => ($view),
+                $view = [
+                    "view"  => ( $view ),
                     "scope" => false,
                     "name"  => $id
-                );
+                ];
             }
             return $view;
         }
@@ -217,7 +224,7 @@ abstract class View extends DirectView {
     /**
      * @inheritDoc
      */
-    public function ref(string $id, bool|string $scope = false, View|bool $view = false) : static {
+    public function ref(string|IShippable $id, bool|string $scope = false, DirectView|bool $view = false) : static {
         if (is_object($id)) $id = self::getObjectId($id);
         parent::ref($id, $scope, $view);
         if (!$this->uniqueId) {
@@ -234,7 +241,7 @@ abstract class View extends DirectView {
     /**
      * @inheritDoc
      */
-    public function pick($object) {
+    public function pick(IShippable $object) : ?array {
         $view = parent::pick($object);
         if ($view) return $view;
         if ($view === null && $this->parent !== null) {
@@ -256,7 +263,7 @@ abstract class View extends DirectView {
     /**
      * @inheritDoc
      */
-    public function bind($object, ?int $event = null, ?ModifyProtocol $protocol = null, ?string $scope = null,
+    public function bind(IShippable $object, ?int $event = null, ?ModifyProtocol $protocol = null, ?string $scope = null,
                          ?array $ignoreData = null, ?DirectView $view = null) : static{
         if (!$this->uniqueId) {
             $this->uniqueId = $this->generateId();
@@ -278,7 +285,7 @@ abstract class View extends DirectView {
      * @param string[] $alive Views that are alive.
      * @return void
      */
-    public static function _gc(array $alive) {
+    public static function _gc(array $alive) : void {
         if (isset($_SESSION)) {
             if (array_key_exists('references', $_SESSION)) {
                 $_SESSION['references'] = array_filter($_SESSION['references'], function ($uniqueId) use ($alive) {
@@ -296,8 +303,9 @@ abstract class View extends DirectView {
     }
 
 
-
-    // Short cuts
+    ///////////////////////////////////////////
+    // Shortcuts
+    ///////////////////////////////////////////
 
     /**
      * Get the subviews.
@@ -309,7 +317,7 @@ abstract class View extends DirectView {
 
     /**
      * Get the parent view.
-     * @return ?View
+     * @return View|null
      */
     public function parent() : ?View {
         return $this->getParent();
@@ -317,7 +325,7 @@ abstract class View extends DirectView {
 
     /**
      * @see View->getRoot
-     * @return ?View
+     * @return View|null
      */
     public function root() : ?View {
         return $this->getRoot();
@@ -337,13 +345,13 @@ abstract class View extends DirectView {
     }
 
     /**
-     * An for each loop.
-     * @param array|object $array An array.
+     * A for each loop shortcut with a callback (View, Element, Key).
+     * @param array|IShippable $array An array.
      * @param Closure $callback The callback function of type (View, Element, Key)
      * @return $this
      */
-    public function each($array, Closure $callback) : static {
-        if (!is_array($array)) $array = array( $array );
+    public function each(array|IShippable $array, Closure $callback) : static {
+        if (!is_array($array)) $array = [ $array ];
         foreach ($array as $key => $el) {
             $callback($this, $el, $key);
         }
@@ -352,12 +360,12 @@ abstract class View extends DirectView {
 
     /**
      * Append something conditional.
-     * @param bool|object $cond A condition.
+     * @param bool|IShippable|null $cond A condition.
      * @param Closure $thenCallback The then callback (View).
      * @param Closure|null $elseCallback The else callback (View).
      * @return $this
      */
-    public function conditional($cond, Closure $thenCallback, ?Closure $elseCallback = null) : static {
+    public function conditional(bool|IShippable|null $cond, Closure $thenCallback, ?Closure $elseCallback = null) : static {
         if ($cond) {
             $thenCallback($this);
         } else {
@@ -394,3 +402,4 @@ abstract class View extends DirectView {
     }
 
 }
+?>

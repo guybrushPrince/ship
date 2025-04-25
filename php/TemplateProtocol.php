@@ -4,54 +4,66 @@ include_once dirname(__FILE__) . '/Protocol.php';
 include_once dirname(__FILE__) . '/ModifyProtocol.php';
 
 /**
- * Class TemplateProtocol
- * Dr. Dipl.-Inf. Thomas M. Prinz
+ * Class TemplateProtocol.
+ *
+ * <p>A {@link TemplateProtocol} is similar to a function defining a chain of protocols and can
+ * be invoked multiple times with {@link ModifyProtocol::doIt()} without the necessity of
+ * multiple code generation.</p>
+ *
+ * <p>A {@link TemplateProtocol} is specified by a <i>name</i>, an <i>environment</i> where this
+ * name is valid, and some protocols.</p>
+ *
+ * @package ship
+ * @subpackge php
+ *
+ * @author Dr. Dipl.-Inf. Thomas M. Prinz
+ * @version 1.0.0
  */
 abstract class TemplateProtocol extends Protocol {
 
     /**
      * An array of template protocols.
-     * @var array
+     * @var TemplateProtocol[]
      */
-    private static $templates = array();
+    private static array $templates = [];
 
     /**
-     * The class of the implementation of the modify abstract class.
+     * The class name of the implementation of this protocol.
      * @var string
      */
-    private $implementation;
+    private string $implementation;
 
     /**
      * The name of the template protocol.
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
-     * The environment of the template protocol.
+     * The environment of the template protocol (something as a namespace).
      * @var string
      */
-    protected $environment;
+    protected string $environment;
 
     /**
-     * Whether the template is used or not.
+     * Whether the template is used, or not.
      * @var bool
      */
-    protected $inUse = false;
+    protected bool $inUse = false;
 
     /**
-     * The template was already sent to the client.
+     * The template was already sent to the client (i.e., it is already generated).
      * @var bool
      */
-    protected $delivered = false;
+    protected bool $delivered = false;
 
     /**
      * TemplateProtocol constructor.
      * @param string $name The name of the template/event.
-     * @param string $implementation The implementation.
+     * @param string $implementation The class name of the implementation.
      * @param string $environment The name of the environment.
      */
-    public function __construct($name, $implementation, $environment) {
+    public function __construct(string $name, string $implementation, string $environment = 'global') {
         parent::__construct(null);
         $this->implementation = $implementation;
         $this->name = $name;
@@ -60,34 +72,35 @@ abstract class TemplateProtocol extends Protocol {
     }
 
     /**
-     * Return the calling name (with environment).
+     * Return the calling name (with environment), i.e., under which name the template is invoked.
      * @return string
      */
-    public function getCallName() {
+    public function getCallName() : string {
         return TemplateProtocol::getCallNameFunc($this->name, $this->environment);
     }
 
     /**
      * @inheritDoc
      */
-    public function generate($context = array(), $entryView = null) : string {
+    public function generate(array $context = [], DirectView|Protocol|null $entryView = null) : string {
         $this->inUse = true;
         return $this->createThrower($context, $entryView);
     }
 
     /**
-     * Create the code to throw the event / template.
+     * Create the code to throw/invoke the template.
      * @param array $context The calling context.
-     * @param DirectView|Protocol $entryView The entry / context view.
+     * @param DirectView|Protocol|null $entryView The entry / context view.
      * @return string
      */
-    public abstract function createThrower(array $context = array(), $entryView = null) : string;
+    public abstract function createThrower(array $context = array(),
+                                           DirectView|Protocol|null $entryView = null) : string;
 
     /**
      * Create code for the template (alias the function).
      * @return string
      */
-    public function listener() {
+    public function listener() : string {
         if (!$this->delivered) {
             $this->delivered = true;
             return $this->createListener();
@@ -97,27 +110,27 @@ abstract class TemplateProtocol extends Protocol {
     }
 
     /**
-     * Create the code for execution after event / template.
+     * Create the code for the template (alias the function).
      * @return string
      */
-    protected abstract function createListener();
+    protected abstract function createListener() : string;
 
     /**
-     * Return the calling name (with environemt).
-     * @param string $name The name of the template/event.
+     * Return the calling name (with environment).
+     * @param string $name The name of the template.
      * @param string $environment The name of the environment.
      * @return string
      */
-    private static function getCallNameFunc($name, $environment = 'global') {
+    private static function getCallNameFunc(string $name, string $environment = 'global') : string {
         return $environment . '_' . $name;
     }
 
     /**
      * Generates the code for all the templates.
-     * @param array $context Some storage context.
+     * @param array $context Some storage context (sent by reference).
      * @return string
      */
-    public static function generateAll(array &$context = array()) {
+    public static function generateAll(array &$context = array()) : string {
         return implode('', array_map(function(TemplateProtocol $protocol) use (&$context) {
             if (!in_array($protocol->getCallName(), $context)) {
                 $context[] = $protocol->getCallName();
@@ -130,7 +143,7 @@ abstract class TemplateProtocol extends Protocol {
      * Generate a modify branch.
      * @return ModifyProtocol
      */
-    public function modify() {
+    public function modify() : ModifyProtocol {
         $impl = $this->implementation;
         $instance = new $impl($this);
         $this->protocol[] = array(
@@ -141,12 +154,12 @@ abstract class TemplateProtocol extends Protocol {
     }
 
     /**
-     * Get the template protocol.
+     * Get a template protocol implementation given by the name and environment.
      * @param string $name The name.
      * @param string $environment The environment.
-     * @return mixed
+     * @return TemplateProtocol
      */
-    public static function get($name, $environment = 'global') {
+    public static function get(string $name, string $environment = 'global') : TemplateProtocol {
         $callName = TemplateProtocol::getCallNameFunc($name, $environment);
         if (!array_key_exists($callName, TemplateProtocol::$templates))
             DebugLogger::instance()->debug($callName, array_keys(TemplateProtocol::$templates));
