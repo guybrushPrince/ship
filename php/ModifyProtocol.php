@@ -445,16 +445,25 @@ abstract class ModifyProtocol extends Protocol {
      * Removes classes from all the view(s)'s siblings.
      * @param DirectView|TemplateObject|array|string $view The given view(s).
      * @param TemplateObject|array|string $clazz The class(es) to remove.
+     * @param bool|null $onlyChildren If only children shall be searched.
      * @return $this
      */
     public function removeClassSiblings(DirectView|TemplateObject|array|string $view,
-                                        TemplateObject|array|string $clazz) : static {
+                                        TemplateObject|array|string $clazz,
+                                        TemplateObject|bool|null $onlyChildren = false) : static {
+        if ($clazz instanceof TemplateObject) {
+            $this->addTemplateObject($clazz);
+        }
+        if ($onlyChildren instanceof TemplateObject) {
+            $this->addTemplateObject($onlyChildren);
+        }
         $view = $this->detectView($view);
         if (!is_array($clazz)) $clazz = [ $clazz ];
         $this->protocol[] = [
             "operation" => "removeClassesSiblings",
             "view"      => $view,
-            "classes"   => $clazz
+            "classes"   => $clazz,
+            "children"  => $onlyChildren
         ];
         return $this;
     }
