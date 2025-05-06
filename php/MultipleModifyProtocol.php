@@ -221,7 +221,8 @@ class MultipleModifyProtocol extends ModifyProtocol {
      * @inheritDoc
      */
     public function removeClassSiblings(DirectView|TemplateObject|array|string $view,
-                                        TemplateObject|array|string $clazz) : static {
+                                        TemplateObject|array|string $clazz,
+                                        TemplateObject|bool|null $onlyChildren = false) : static {
         foreach ($this->multiProtocols as $p) $p->removeClassSiblings($view, $clazz);
         return $this;
     }
