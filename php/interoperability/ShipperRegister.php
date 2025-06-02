@@ -72,8 +72,9 @@ class ShipperRegister {
      * @return string
      */
     public static function getObjectString(IShippable $object) : string {
+        $key = self::$shipper->getKey($object);
         return self::$shipper->getClass($object) . '<::>' .
-            self::convertKey(self::$shipper->getKey($object));
+            (self::$shipper->hasStringKey($object) ? $key : self::convertKey($key));
     }
 
     /**

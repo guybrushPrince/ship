@@ -24,6 +24,13 @@ abstract class AShipper {
     public abstract function getKey(IShippable $shippable) : string|int;
 
     /**
+     * Whether the given object has a string key, or not.
+     * @param IShippable|string $shippable The shipple object or class of the object.
+     * @return bool
+     */
+    public abstract function hasStringKey(IShippable|string $shippable) : bool;
+
+    /**
      * Get the class of the shippable object.
      * @param IShippable $shippable The shippable object.
      * @return string
