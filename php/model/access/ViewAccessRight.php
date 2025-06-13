@@ -33,6 +33,7 @@ class ViewAccessRight extends BObject {
      * @crucial
      * @type Group
      * @var Group
+     * @index group_idx
      */
     protected $group;
 
