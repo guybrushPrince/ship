@@ -43,6 +43,12 @@ class ActionRegister {
     private ?Protocol $sessionTimeout = null;
 
     /**
+     * The registered controllers.
+     * @var string[]
+     */
+    private static array $controllers = [];
+
+    /**
      * Create or get the singleton action protocol instance.
      * @param RouteCollectorProxy|null $app
      * @return ActionRegister
@@ -88,11 +94,12 @@ class ActionRegister {
 
     /**
      * Register a controller.
-     * @param array|string $classNames The class name of the controller.
+     * @param string[]|string $classNames The class name of the controller.
      * @throws ReflectionException
      */
-    public function register($classNames) {
+    public function register(array|string $classNames) : void {
         if (!is_array($classNames)) $classNames = array($classNames);
+        self::$controllers = array_merge(self::$controllers, $classNames);
         foreach ($classNames as $className) {
             $clazz = new ReflectionClass($className);
             $obj = new $className;
@@ -148,6 +155,31 @@ class ActionRegister {
                 }
             }
         }
+    }
+
+    /**
+     * Find the controller for a given method (and scope).
+     * @param string $method The method.
+     * @param string|null $scope The optional scope.
+     * @return object|null
+     */
+    public static function findControllerFor(string $method, ?string $scope = null) : object|null {
+        foreach (self::$controllers as $controllerClass) {
+            if (class_exists($controllerClass)) {
+                $controller = new $controllerClass();
+                if ($scope && $controller instanceof ShipController) {
+                    if ($scope === $controller->getScope()) {
+                        $refClass = new ReflectionClass($controllerClass);
+                        if ($refClass->hasMethod($method)) return $controller;
+                        else return null;
+                    }
+                } else {
+                    $refClass = new ReflectionClass($controllerClass);
+                    if ($refClass->hasMethod($method)) return $controller;
+                }
+            }
+        }
+        return null;
     }
 
     /**
