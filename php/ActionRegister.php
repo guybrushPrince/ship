@@ -201,6 +201,10 @@ class ActionRegister {
                         return $t->getName();
                     }, $type->getTypes()));
 
+                    if (is_string($value) && in_array('array', $types)) {
+                        $value = Tools::jsonDecode($value);
+                    }
+
                     $types = array_diff($types, array_merge($ignore, ['null', 'array']));
                     if (!Tools::isEmpty($types)) {
                         $class = $types[array_key_first($types)];
