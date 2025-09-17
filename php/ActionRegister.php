@@ -201,7 +201,7 @@ class ActionRegister {
                         return $t->getName();
                     }, $type->getTypes()));
 
-                    if (is_string($value) && in_array('array', $types)) {
+                    if (is_string($value) && in_array('array', $types) && count($types) === 1) {
                         $value = Tools::jsonDecode($value);
                     }
 
