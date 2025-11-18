@@ -263,8 +263,8 @@ abstract class View extends DirectView {
     /**
      * @inheritDoc
      */
-    public function bind(IShippable $object, ?int $event = null, ?ModifyProtocol $protocol = null, ?string $scope = null,
-                         ?array $ignoreData = null, ?DirectView $view = null) : static{
+    public function bind(IShippable $object, array|int|null $event = null, ?ModifyProtocol $protocol = null,
+                         ?string $scope = null, ?array $ignoreData = null, ?DirectView $view = null) : static{
         if (!$this->uniqueId) {
             $this->uniqueId = $this->generateId();
         }

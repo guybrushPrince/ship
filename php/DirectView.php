@@ -102,14 +102,14 @@ abstract class DirectView {
     /**
      * Bind an object to a view.
      * @param IShippable $object The object.
-     * @param int|null $event The event to react on.
+     * @param int[]|int|null $event The event(s) to react on.
      * @param ModifyProtocol|null $protocol The protocol to execute on the event.
      * @param string|null $scope A possible scope for the event.
      * @param string[]|null $ignoreData Whether specific data fields shall be ignored, or not.
      * @param DirectView|null $view (internal).
      * @return $this
      */
-    public function bind(IShippable $object, ?int $event = null, ?ModifyProtocol $protocol = null,
+    public function bind(IShippable $object, array|int|null $event = null, ?ModifyProtocol $protocol = null,
                          ?string $scope = null,
                          ?array $ignoreData = null, ?DirectView $view = null) : static {
         $id = self::getObjectId($object);
