@@ -1,6 +1,8 @@
 <?php
 
-include_once __DIR__ . '/AShipper.php';
+namespace ship\interoperability;
+
+use Error;
 
 /**
  * Class ShipperRegister.
@@ -64,6 +66,16 @@ class ShipperRegister {
         if (is_null(self::$shipper))
             throw new Error('Please register an implementation of an AShipper.');
         return self::$shipper->getObject($class, $key);
+    }
+
+    /**
+     * Is there currently an available user session?
+     * @return bool
+     */
+    public static function hasActiveUserSession() : bool {
+        if (is_null(self::$shipper))
+            throw new Error('Please register an implementation of an AShipper.');
+        return self::$shipper->hasActiveUserSession();
     }
 
     /**

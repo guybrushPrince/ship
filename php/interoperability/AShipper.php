@@ -1,5 +1,7 @@
 <?php
 
+namespace ship\interoperability;
+
 include_once __DIR__ . '/IShippable.php';
 
 /**
@@ -12,7 +14,7 @@ include_once __DIR__ . '/IShippable.php';
  * @subpackge php/interoperability
  *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
- * @version 1.0.0
+ * @version 1.2.0
  */
 abstract class AShipper {
 
@@ -46,6 +48,12 @@ abstract class AShipper {
      * @return IShippable|null
      */
     public abstract function getObject(string $class, string|int|array $key) : ?IShippable;
+
+    /**
+     * Is there currently an available user session?
+     * @return bool
+     */
+    public abstract function hasActiveUserSession() : bool;
 
 }
 ?>
