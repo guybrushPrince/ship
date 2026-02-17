@@ -46,7 +46,7 @@ abstract class DialogProtocol extends Protocol {
      * @param string $implementation The class name of the implementation.
      */
     public function __construct(ModifyProtocol $parent, array $texts, ?array $options = null,
-                                string $implementation = "DialogProtocol") {
+                                string $implementation = DialogProtocol::class) {
         parent::__construct($parent);
         $this->implementation = $implementation;
         if ($options === null) {
