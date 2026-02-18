@@ -23,5 +23,11 @@ interface EventAdder {
      */
     public static function add() : bool;
 
+    /**
+     * Get the name of the environment.
+     * @return string
+     */
+    public static function environment() : string;
+
 }
 ?>
