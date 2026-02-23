@@ -2,6 +2,8 @@
 
 namespace ship\interoperability;
 
+use Exception;
+
 class ShippingTools {
 
     /**
@@ -126,6 +128,42 @@ class ShippingTools {
      */
     public static function unique(array $array) : array {
         return array_reduce($array, function($a, $b) { if (!in_array($b, $a)) $a[] = $b; return $a; }, []);
+    }
+
+    /**
+     * Checks if a specific object of {@link IShippable} is in a given array.
+     * @param IShippable[] $arr The array.
+     * @param IShippable $obj The object.
+     * @return bool
+     */
+    public static function inArray(array $arr, IShippable $obj) : bool {
+        foreach ($arr as $a) {
+            if (get_class($a) === get_class($obj) &&
+                ShipperRegister::getKey($a) === ShipperRegister::getKey($obj)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Generates an UUID.
+     * @param string|null $data The data.
+     * @return string
+     * @throws Exception
+     *
+     * @url https://www.uuidgenerator.net/dev-corner/php
+     */
+    public static function uuid(string $data = null) : string {
+        // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
+        $data = $data ?? random_bytes(16);
+        assert(strlen($data) == 16);
+
+        // Set version to 0100
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        // Set bits 6-7 to 10
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+        // Output the 36 character UUID.
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 }
 ?>
