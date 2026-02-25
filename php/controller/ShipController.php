@@ -18,6 +18,7 @@ abstract class ShipController {
     /**
      * Get the scope of the controller.
      * @return string|null
+     * @ignore
      */
     public function getScope() : ?string {
         return null;

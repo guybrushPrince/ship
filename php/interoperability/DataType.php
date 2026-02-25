@@ -13,7 +13,7 @@ namespace ship\interoperability;
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
  * @version 1.0.0
  */
-class DataType {
+class DataType extends SEnumeration {
 
     /*
      * Defining constants for different data types.
@@ -84,5 +84,19 @@ class DataType {
         12  =>  'FUNCTIONS',
         13  =>  'DATALIST'
     ];
+
+    /**
+     * @inheritDoc
+     */
+    public static function getValues() : array {
+        return self::TYPE_ID;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getNames() : array {
+        return self::TITLES;
+    }
 }
 ?>

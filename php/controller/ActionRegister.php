@@ -128,6 +128,7 @@ class ActionRegister {
             $obj = new $className;
             if ($this->app) {
                 foreach ($clazz->getMethods() as $method) {
+                    if ($this->shallIgnore($method)) continue;
                     // Create a service function that maps parameters and handles the output.
                     $isGet = $this->isGet($method);
                     $without = $this->isWithout($method);
@@ -441,6 +442,10 @@ class ActionRegister {
         $response = $response->withHeader('Content-Type', $contentType . '; charset=utf-8')->withStatus($status);
         if ($body !== null) $response->getBody()->write($body);
         return $response;
+    }
+
+    private function shallIgnore(ReflectionMethod $method) : bool {
+        return $this->isArbitrary($method, 'ignore');
     }
 
     private function isGet(ReflectionMethod $method) : bool {

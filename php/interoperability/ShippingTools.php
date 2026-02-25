@@ -64,6 +64,31 @@ class ShippingTools {
     }
 
     /**
+     * Returns the last n lines of a file.
+     * @param string $file The file.
+     * @param int $numberLines The number of lines to return.
+     * @return string|null
+     */
+    public static function getLastLinesOfFile(string $file, int $numberLines = 100) : string|null {
+        if (!file_exists($file) && !self::urlExists($file)) return null;
+        $windows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        if ($windows) {
+            $lines = array();
+            $fp = fopen($file, "r");
+            while (!feof($fp)) {
+                $line = fgets($fp, 4096);
+                $lines[] = $line;
+                if (count($lines) > $numberLines) array_shift($lines);
+            }
+            fclose($fp);
+            return implode(PHP_EOL, $lines);
+        } else {
+            exec("tail -" . $numberLines . " \"" . $file . "\"", $output);
+            return implode(PHP_EOL, $output);
+        }
+    }
+
+    /**
      * Mask typical characters causing problems.
      * @param string $str The string to mask.
      * @return string
@@ -164,6 +189,17 @@ class ShippingTools {
 
         // Output the 36 character UUID.
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    /**
+     * Checks if a given URL exists.
+     * @param string $url The URL to check.
+     * @return bool
+     */
+    public static function urlExists(string $url) : bool {
+        if (!self::startsWith('http', $url)) return false;
+        $headers = get_headers($url);
+        return (bool) stripos($headers[0], "200 OK");
     }
 }
 ?>

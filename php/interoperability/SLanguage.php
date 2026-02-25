@@ -14,12 +14,12 @@ namespace ship\interoperability;
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
  * @version 1.2.0
  */
-class SLanguage {
+class SLanguage extends SEnumeration {
 
-    const GERMAN 	= 0;
-    const ENGLISH 	= 1;
-    const SPANISH 	= 2;
-    const FRENCH 	= 3;
+    public const GERMAN      = 0;
+    public const ENGLISH     = 1;
+    public const SPANISH     = 2;
+    public const FRENCH      = 3;
 
     public const LANGUAGE = [
         self::GERMAN  => 'GERMAN',
@@ -48,5 +48,19 @@ class SLanguage {
         self::SPANISH => 'es',
         self::FRENCH  => 'fr'
     ];
+
+    /**
+     * @inheritDoc
+     */
+    public static function getValues() : array {
+        return self::LANGUAGE_ID;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getNames() : array {
+        return self::BCP47;
+    }
 }
 ?>
