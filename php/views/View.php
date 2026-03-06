@@ -277,7 +277,7 @@ abstract class View extends DirectView {
      * @inheritDoc
      */
     public function bind(IShippable $object, array|int|null $event = null, ?ModifyProtocol $protocol = null,
-                         ?string    $scope = null, ?array $ignoreData = null, ?DirectView $view = null) : static {
+                         ?string $scope = null, ?array $ignoreData = null, ?DirectView $view = null) : static {
         if (!$this->uniqueId) {
             $this->uniqueId = $this->generateId();
         }
@@ -290,6 +290,21 @@ abstract class View extends DirectView {
         }
         if ($this->parent !== null && $event === null)
             $this->parent->bind($object, $event, $protocol, $scope, $ignoreData, ($view ? $view : $this));
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bindBroadcast(array|int $event, ?ModifyProtocol $protocol = null,
+                                  ?string $scope = null, ?array $ignoreData = null, ?DirectView $view = null) : static {
+        if (!$this->uniqueId) {
+            $this->uniqueId = $this->generateId();
+        }
+        parent::bindBroadcast($event, $protocol, $scope, $ignoreData, $view);
+
+        if ($this->parent !== null && $event === null)
+            $this->parent->bindBroadcast($event, $protocol, $scope, $ignoreData, ($view ? $view : $this));
         return $this;
     }
 

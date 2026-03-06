@@ -278,6 +278,15 @@ class MultipleModifyProtocol extends ModifyProtocol {
     /**
      * @inheritDoc
      */
+    public function broadcastEvent(TemplateObject|int $event, TemplateObject|array|string|null $scopes = null,
+                                   TemplateObject|array|null $data = null) : static {
+        foreach ($this->multiProtocols as $p) $p->broadcastEvent($event, $scopes, $data);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function openWindow(TemplateObject|string $url, TemplateObject|string $name,
                                ?TemplateObject $protocol = null,
                                DirectView|TemplateObject|array|string|null $view = null) : static {

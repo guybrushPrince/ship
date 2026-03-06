@@ -612,6 +612,36 @@ abstract class ModifyProtocol extends Protocol {
     }
 
     /**
+     * Broadcasts an event.
+     * @param TemplateObject|int $event The event.
+     * @param TemplateObject|string[]|string|null $scopes The scope(s).
+     * @param TemplateObject|array|null $data Some additional data.
+     * @return $this
+     */
+    public function broadcastEvent(TemplateObject|int $event,
+                                   TemplateObject|array|string|null $scopes = null,
+                                   TemplateObject|array|null $data = null) : static {
+        if ($event instanceof TemplateObject) {
+            $this->addTemplateObject($event);
+        }
+        if ($scopes instanceof TemplateObject) {
+            $this->addTemplateObject($scopes);
+        } else if ($scopes && is_string($scopes)) {
+            $scopes = [$scopes];
+        }
+        if ($data instanceof TemplateObject) {
+            $this->addTemplateObject($data);
+        }
+        $this->protocol[] = [
+            "operation" => "broadcastEvent",
+            "event" => $event,
+            "scopes" => $scopes,
+            "data" => $data
+        ];
+        return $this;
+    }
+
+    /**
      * Opens a new browser popup window with a given url and name.
      * @param TemplateObject|string $url The url.
      * @param TemplateObject|string $name The name of the window.

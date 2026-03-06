@@ -128,6 +128,20 @@ abstract class DirectView {
     }
 
     /**
+     * Register or bind a view to an event (and scope) to listen to broadcast events.
+     * @param int[]|int $event The event(s) to react on.
+     * @param ModifyProtocol|null $protocol The protocol to execute on the event.
+     * @param string|null $scope A possible scope for the event.
+     * @param string[]|null $ignoreData Whether specific data fields shall be ignored, or not.
+     * @param DirectView|null $view (internal).
+     * @return $this
+     */
+    public function bindBroadcast(array|int $event, ?ModifyProtocol $protocol = null, ?string $scope = null,
+                                  ?array $ignoreData = null, ?DirectView $view = null) : static {
+        return $this;
+    }
+
+    /**
      * Get the reference names of this view.
      * @return string[]
      */
