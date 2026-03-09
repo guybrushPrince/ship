@@ -308,7 +308,7 @@ class ActionRegister {
      * @return Response
      */
     private function handleMethodOutput(Response $response, ReflectionMethod $method,
-                                        View|Fail|Script|ShipError|bool|array|string $retValue) : Response {
+                                        View|Fail|Script|ShipError|bool|array|string|null $retValue) : Response {
         if ($retValue instanceof Fail) {
             $content = $retValue->getContent();
             if (is_array($content)) {
@@ -351,6 +351,8 @@ class ActionRegister {
             else $response = $this->setResponse($response, ShippingTools::jsonEncode($retValue));
         } else if ($retValue instanceof View) {
             $response = $this->setResponse($response, $this->serializeView($retValue) . ' ', 'text/html');
+        } else if (is_null($retValue)) {
+            $response = $this->setResponse($response, '', 'text/html');
         } else if ($retValue instanceof ShipError) {
             $response = $this->setResponse($response, ShippingTools::jsonEncode($retValue->serialize()), 'application/json', 404);
         } else if ($retValue instanceof Script) {
