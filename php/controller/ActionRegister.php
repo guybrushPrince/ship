@@ -315,8 +315,8 @@ class ActionRegister {
                 $isViewsArray = count(array_filter($content, function ($val) {
                         return !($val instanceof View);
                     })) === 0;
-                if ($isViewsArray) $content = $this->serializeView($content);
-            } else if ($content instanceof View) $content = $this->serializeView($content);
+                if ($isViewsArray) $content = $this->serializeView($content, $this->isPure($method));
+            } else if ($content instanceof View) $content = $this->serializeView($content, $this->isPure($method));
             $retValue = [
                 Fail::INTERN_FAIL => Fail::INTERN_FAIL,
                 "content" => $content
@@ -347,10 +347,10 @@ class ActionRegister {
             $isViewsArray = count(array_filter($retValue, function ($val) {
                     return !($val instanceof View);
                 })) === 0;
-            if ($isViewsArray) $response = $this->setResponse($response, $this->serializeView($retValue) . ' ', 'text/html');
+            if ($isViewsArray) $response = $this->setResponse($response, $this->serializeView($retValue, $this->isPure($method)) . ' ', 'text/html');
             else $response = $this->setResponse($response, ShippingTools::jsonEncode($retValue));
         } else if ($retValue instanceof View) {
-            $response = $this->setResponse($response, $this->serializeView($retValue) . ' ', 'text/html');
+            $response = $this->setResponse($response, $this->serializeView($retValue, $this->isPure($method)) . ' ', 'text/html');
         } else if (is_null($retValue)) {
             $response = $this->setResponse($response, '', 'text/html');
         } else if ($retValue instanceof ShipError) {
@@ -369,13 +369,14 @@ class ActionRegister {
     /**
      * A single or multiple views.
      * @param View|View[] $views The view(s)
+     * @param bool $pure If the pure view without JS, etc. shall be returned.
      * @return string
      */
-    private function serializeView(array|View $views) : string {
+    private function serializeView(array|View $views, bool $pure = false) : string {
         $views = is_array($views) ? $views : array($views);
-        return implode(array_map(function (View $view) {
+        return implode(array_map(function (View $view) use ($pure) {
             if (View::isImplementation($view)) {
-                return $view->generate($this->shouldParsedCompletely($view), true);
+                return $view->generate(!$pure && $this->shouldParsedCompletely($view), !$pure);
             } else return '';
         }, $views));
     }
@@ -448,6 +449,10 @@ class ActionRegister {
 
     private function shallIgnore(ReflectionMethod $method) : bool {
         return $this->isArbitrary($method, 'ignore');
+    }
+
+    private function isPure(ReflectionMethod $method) : bool {
+        return $this->isArbitrary($method, 'pure');
     }
 
     private function isGet(ReflectionMethod $method) : bool {
