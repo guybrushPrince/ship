@@ -107,6 +107,19 @@ class ShippingTools {
     }
 
     /**
+     * Only unique elements with unique keys in an array.
+     * @param IShippable[] $array The array
+     * @return IShippable[]
+     */
+    public static function uniqueKeys(array $array) : array {
+        return array_values(
+            array_reduce($array, function ($a, IShippable $o) {
+                $a[ShipperRegister::getKey($o)] = $o; return $a;
+            }, [])
+        );
+    }
+
+    /**
      * Does the given array has any string as a key?
      * @param array $array The array to check.
      * @return bool
