@@ -84,16 +84,21 @@ abstract class View extends DirectView {
 
     /**
      * The view.
-     * @param View $view
-     * @return View
+     * @param View[]|View $view The view(s) to add.
+     * @return View|null
      */
-    public function add(View $view) : View {
-        $this->subviews[] = $view;
-        $view->parent = $this;
-        foreach ($view->references as $name => $info) {
-            $this->ref($name, $info["scope"], $info["view"]);
+    public function add(array|View $view) : View|null {
+        if (!is_array($view)) $views = [ $view ];
+        else $views = $view;
+        foreach ($views as $v) {
+            $this->subviews[] = $v;
+            $v->parent = $this;
+            foreach ($v->references as $name => $info) {
+                $this->ref($name, $info["scope"], $info["view"]);
+            }
         }
-        return $view;
+        if (!is_array($view)) return $view;
+        else return null;
     }
 
     /**

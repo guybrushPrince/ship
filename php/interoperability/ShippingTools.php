@@ -214,5 +214,25 @@ class ShippingTools {
         $headers = get_headers($url);
         return (bool) stripos($headers[0], "200 OK");
     }
+
+    /**
+     * Compute the mean value.
+     * @param int[]|float[] $values The values.
+     * @return float|int
+     */
+    public static function mean(array $values) : int|float {
+        return array_sum($values) / count($values);
+    }
+
+    /**
+     * Print a text with potential space at the beginning.
+     * @param string $text The text to print.
+     * @param int $depth (optional) the deep
+     * @param int $shelf (optional) the tab size
+     * @return string
+     */
+    static public function code(string $text, int $depth = 0, int $shelf = 4) : string {
+        return sprintf("%'. " . ($depth * $shelf) . "s%s", "", $text);
+    }
 }
 ?>

@@ -37,7 +37,7 @@ class TextView extends View {
     /**
      * @inheritDoc
      */
-    public function add(View $view) : View {
+    public function add(array|View $view) : View|null {
         return $this;
     }
 
