@@ -379,11 +379,12 @@ abstract class View extends DirectView {
 
     /**
      * A for each loop shortcut with a callback (View, Element, Key).
-     * @param array|IShippable $array An array.
+     * @param array|IShippable|null $array An array.
      * @param Closure $callback The callback function of type (View, Element, Key)
      * @return $this
      */
-    public function each(array|IShippable $array, Closure $callback) : static {
+    public function each(array|IShippable|null $array, Closure $callback) : static {
+        if (is_null($array)) return $this;
         if (!is_array($array)) $array = [$array];
         foreach ($array as $key => $el) {
             $callback($this, $el, $key);
