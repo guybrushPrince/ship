@@ -45,6 +45,18 @@ abstract class ActionProtocol extends Protocol {
     private static string|null $serverURL = null;
 
     /**
+     * The relative url to the application API without user/group/etc.
+     * @var string|null
+     */
+    private static string|null $apiURL = null;
+
+    /**
+     * The relative url to the application API starting after user/group/etc. specifics.
+     * @var string|null
+     */
+    private static string|null $relativeApiURL = null;
+
+    /**
      * The class of the implementation of the modify abstract class.
      * @var string
      */
@@ -192,6 +204,13 @@ abstract class ActionProtocol extends Protocol {
             self::$cfg['ssl'] = $ssl;
 
             if (is_null(self::$serverURL)) self::$serverURL = $urls['fallback'];
+
+            if (array_key_exists('baseApi', $urls)) {
+                self::$apiURL = $urls['baseApi'];
+            }
+            if (array_key_exists('relApi', $urls)) {
+                self::$relativeApiURL = $urls['relApi'];
+            }
         }
     }
 
@@ -221,6 +240,22 @@ abstract class ActionProtocol extends Protocol {
      */
     public static function setServerURL(string $url) : void {
         self::$serverURL = $url;
+    }
+
+    /**
+     * Get the API url if available.
+     * @return string
+     */
+    public static function getApiURL() : string {
+        return !is_null(self::$apiURL) ? self::$apiURL : '';
+    }
+
+    /**
+     * Get the API url if available.
+     * @return string
+     */
+    public static function getRelativeApiURL() : string {
+        return !is_null(self::$relativeApiURL) ? self::$relativeApiURL : '';
     }
 
     /**
