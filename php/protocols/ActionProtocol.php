@@ -5,6 +5,7 @@ namespace ship\protocols;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
+use ship\interoperability\ShippingTools;
 use ship\template\TemplateObject;
 use ship\views\View;
 
@@ -19,7 +20,7 @@ use ship\views\View;
  * @subpackge php/protocols
  *
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
- * @version 1.0.0
+ * @version 1.2.0
  *
  * @protocol
  */
@@ -32,10 +33,16 @@ abstract class ActionProtocol extends Protocol {
     protected static array $prohibitedActions = [];
 
     /**
-     * The url to the server.
-     * @var bool|string
+     * An array of configurations.
+     * @var array|null
      */
-    public static bool|string $serverURL = false;
+    protected static array|null $cfg = null;
+
+    /**
+     * The url to the server.
+     * @var string|null
+     */
+    private static string|null $serverURL = null;
 
     /**
      * The class of the implementation of the modify abstract class.
@@ -87,15 +94,7 @@ abstract class ActionProtocol extends Protocol {
     public function __construct(ModifyProtocol $parent, string $controller, string $method, string $implementation,
                                 array $parameters = [], array|string $title = [], string|int|null $action = null) {
         parent::__construct($parent);
-        if (!self::$serverURL) {
-            $ini = parse_ini_file(__DIR__ . '/../../../cfg.ini', TRUE);
-            $urls = $ini["urls"];
 
-            self::$serverURL = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ?
-                    'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/' . $urls['baseUrl'];
-
-            if (!self::$serverURL) self::$serverURL = $urls['fallback'];
-        }
         $this->implementation = $implementation;
         $this->controller = $controller;
         $this->method = $method;
@@ -174,6 +173,54 @@ abstract class ActionProtocol extends Protocol {
         if (!is_array($action)) $actions = [ $action ];
         else $actions = $action;
         foreach ($actions as $action) self::$prohibitedActions[$action] = $action;
+    }
+
+    /**
+     * Set configurations. These configurations can be, for example, preloaded from an ini file.
+     * @param array $cfg.
+     * @return void
+     */
+    public static function setConfigurations(array $cfg) : void {
+        self::$cfg = $cfg;
+        if (array_key_exists('urls', $cfg)) {
+            $urls = $cfg["urls"];
+
+            $ssl = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443);
+            $host = $_SERVER['SERVER_NAME'];
+            self::$serverURL = ($ssl ? 'https://' : 'http://') . $host . '/' . $urls['baseUrl'];
+            self::$cfg['host'] = $host;
+            self::$cfg['ssl'] = $ssl;
+
+            if (is_null(self::$serverURL)) self::$serverURL = $urls['fallback'];
+        }
+    }
+
+    /**
+     * Get a configuration given by a key.
+     * @param string $key The key within the configuration.
+     * @return array|string|int|bool|null
+     */
+    public static function getConfiguration(string $key) : array|string|int|bool|null {
+        if (!is_null(self::$cfg) && array_key_exists($key, self::$cfg)) return self::$cfg[$key];
+        return null;
+    }
+
+    /**
+     * Get the base server url.
+     * @return string
+     */
+    public static function getServerURL() : string {
+        return !is_null(self::$serverURL) ? self::$serverURL : '';
+    }
+
+    /**
+     * Should be handled with care.
+     * @param string $url The base server url.
+     * @return void
+     * @internal
+     */
+    public static function setServerURL(string $url) : void {
+        self::$serverURL = $url;
     }
 
     /**

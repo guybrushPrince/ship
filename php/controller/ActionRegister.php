@@ -339,7 +339,7 @@ class ActionRegister {
                     ->withHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
                 readfile($retValue);
             } else if ($this->isZIP($method)) {
-                $response = $this->setResponse($response, ActionProtocol::$serverURL . $retValue, 'text/html');
+                $response = $this->setResponse($response, ActionProtocol::getServerURL() . $retValue, 'text/html');
             } else $response = $this->setResponse($response, $retValue, 'text/html');
         } else if (is_bool($retValue)) {
             $response = $this->setResponse($response, ShippingTools::jsonEncode($retValue));
