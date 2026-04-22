@@ -171,13 +171,17 @@ class ShippingTools {
     /**
      * Checks if a specific object of {@link IShippable} is in a given array.
      * @param IShippable[] $arr The array.
-     * @param IShippable $obj The object.
+     * @param IShippable|string|int $obj The object or the key of the object.
      * @return bool
      */
-    public static function inArray(array $arr, IShippable $obj) : bool {
+    public static function inArray(array $arr, IShippable|string|int $obj) : bool {
+        $isId = is_string($obj) || is_int($obj);
+        $oKey = $isId ? $obj : ShipperRegister::getKey($obj);
+
         foreach ($arr as $a) {
-            if (get_class($a) === get_class($obj) &&
-                ShipperRegister::getKey($a) === ShipperRegister::getKey($obj)) return true;
+            $aIsId = (is_string($a) || is_int($a));
+            $aKey = $aIsId ? $a : ShipperRegister::getKey($a);
+            if (($isId || $aIsId || get_class($a) === get_class($obj)) && $aKey === $oKey) return true;
         }
         return false;
     }
