@@ -45,9 +45,21 @@ abstract class AShipper {
      * Get a shippable object with a specific class and key.
      * @param string $class The class of the object.
      * @param string|int|array $key The key of the object.
+     * @param bool $keyAsIs If the key should be de-converted.
      * @return IShippable|null
      */
-    public abstract function getObject(string $class, string|int|array $key) : ?IShippable;
+    public abstract function getObject(string $class, string|int|array $key,
+                                       bool $keyAsIs = false) : ?IShippable;
+
+    /**
+     * Does a shippable object with a specific class and key exists?
+     * @param string $class The class of the object.
+     * @param string|int|array $key The key of the object.
+     * @param bool $keyAsIs If the key should be de-converted.
+     * @return bool
+     */
+    public abstract function exists(string $class, string|int|array $key,
+                                    bool $keyAsIs = false) : bool;
 
     /**
      * Is there currently an available user session?

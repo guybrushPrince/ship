@@ -60,12 +60,28 @@ class ShipperRegister {
      * Get a shippable object with a specific class and key.
      * @param string $class The class of the object.
      * @param string|int|array $key The key of the object.
+     * @param bool $keyAsIs If the key shall be used as-is or shall be de-converted (default).
      * @return IShippable|null
      */
-    public static function getObject(string $class, string|int|array $key) : ?IShippable {
+    public static function getObject(string $class, string|int|array $key,
+                                     bool $keyAsIs = false) : ?IShippable {
         if (is_null(self::$shipper))
             throw new Error('Please register an implementation of an AShipper.');
-        return self::$shipper->getObject($class, $key);
+        return self::$shipper->getObject($class, $key, $keyAsIs);
+    }
+
+    /**
+     * Checks if a shippable object with a specific class and key exists.
+     * @param string $class The class of the object.
+     * @param string|int|array $key The key of the object.
+     * @param bool $keyAsIs If the key shall be used as-is or shall be de-converted (default).
+     * @return bool
+     */
+    public static function exists(string $class, string|int|array $key,
+                                  bool $keyAsIs = false) : bool {
+        if (is_null(self::$shipper))
+            throw new Error('Please register an implementation of an AShipper.');
+        return self::$shipper->exists($class, $key, $keyAsIs);
     }
 
     /**
