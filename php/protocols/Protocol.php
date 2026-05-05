@@ -2,10 +2,10 @@
 
 namespace ship\protocols;
 
-use ship\interoperability\ShipperRegister;
 use ship\interoperability\ShippingTools;
 use ship\template\TemplateObject;
 use ship\views\DirectView;
+use webship\JSFunction;
 
 /**
  * Class Protocol.
