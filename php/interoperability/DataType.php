@@ -33,6 +33,7 @@ class DataType extends SEnumeration {
     public const FACTOR     = 11;
     public const FUNCTIONS  = 12;
     public const DATALIST   = 13;
+    public const COLOR      = 14;
 
     public const TYPE = [
         0   =>  'STRING',
@@ -65,7 +66,8 @@ class DataType extends SEnumeration {
         'LISTS'     => 10,
         'FACTOR'    => 11,
         'FUNCTIONS' => 12,
-        'DATALIST'  => 13
+        'DATALIST'  => 13,
+        'COLOR'     => 14
     ];
 
     public const TITLES = [
@@ -82,7 +84,8 @@ class DataType extends SEnumeration {
         10  =>  'LISTS',
         11  =>  'FACTOR',
         12  =>  'FUNCTIONS',
-        13  =>  'DATALIST'
+        13  =>  'DATALIST',
+        14  =>  'COLOR'
     ];
 
     /**
