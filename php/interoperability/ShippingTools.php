@@ -22,10 +22,11 @@ class ShippingTools {
 
     /**
      * Decodes the JSON to PHP data types.
-     * @param string $jsonString The JSON string.
+     * @param string|null $jsonString The JSON string.
      * @return array|string|float|int|bool|null
      */
-    public static function jsonDecode(string $jsonString) : array|string|float|int|bool|null {
+    public static function jsonDecode(string|null $jsonString) : array|string|float|int|bool|null {
+        if (is_null($jsonString)) return null;
         return json_decode($jsonString,true);
     }
 
