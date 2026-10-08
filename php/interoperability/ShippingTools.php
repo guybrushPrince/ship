@@ -2,7 +2,9 @@
 
 namespace ship\interoperability;
 
+use Closure;
 use Exception;
+use ship\views\View;
 
 class ShippingTools {
 
@@ -236,8 +238,26 @@ class ShippingTools {
      * @param int $shelf (optional) the tab size
      * @return string
      */
-    static public function code(string $text, int $depth = 0, int $shelf = 4) : string {
+    public static function code(string $text, int $depth = 0, int $shelf = 4) : string {
         return sprintf("%'. " . ($depth * $shelf) . "s%s", "", $text);
+    }
+
+    /**
+     * Sorts an array alphabetically using the current language and a general extractor to get the string to compare
+     * out of complex objects such as a {@link IShippable} instance.
+     * @param array $array The array to sort.
+     * @param Closure $extractor The extractor function ($a): string
+     * @return array
+     */
+    public static function sortAlphabetically(array $array, Closure $extractor) : array {
+        if (View::getLanguage() === SLanguage::GERMAN) {
+            setlocale(LC_ALL, 'de_DE@euro', 'de_DE', 'deu_deu');
+        } else setlocale(LC_ALL, 'en_US.UTF-8', 'en_US', 'English');
+
+        usort($array, function ($a, $b) use ($extractor) {
+            return strcoll(strtolower($extractor($a)), strtolower($extractor($b)));
+        });
+        return $array;
     }
 }
 ?>
