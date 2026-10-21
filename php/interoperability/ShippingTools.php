@@ -116,8 +116,9 @@ class ShippingTools {
      */
     public static function uniqueKeys(array $array) : array {
         return array_values(
-            array_reduce($array, function ($a, IShippable $o) {
-                $a[ShipperRegister::getKey($o)] = $o; return $a;
+            array_reduce($array, function (array $a, IShippable $o) {
+                $a[ShipperRegister::getKey($o)] = $o;
+                return $a;
             }, [])
         );
     }
