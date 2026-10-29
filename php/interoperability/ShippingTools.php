@@ -67,6 +67,18 @@ class ShippingTools {
     }
 
     /**
+     * Converts a string with special characters in one without.
+     * @param string $str The string.
+     * @return string
+     */
+    public static function slug(string $str) : string {
+        $str = strtolower($str);
+        $str = preg_replace('/[^a-z0-9 -]+/', '', $str);
+        $str = str_replace(' ', '-', $str);
+        return trim($str, '-');
+    }
+
+    /**
      * Returns the last n lines of a file.
      * @param string $file The file.
      * @param int $numberLines The number of lines to return.
