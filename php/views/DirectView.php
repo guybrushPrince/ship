@@ -21,6 +21,8 @@ use ship\protocols\ModifyProtocol;
  */
 abstract class DirectView {
 
+    public const VALUE_SCOPE = 'value';
+
     /**
      * A reference list with string-indexed pairs of ["scope", "view", "name"] objects.
      * @var array
