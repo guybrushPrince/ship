@@ -3,6 +3,7 @@
 namespace ship\protocols;
 
 use Closure;
+use Exception;
 use ship\interoperability\IShippable;
 use ship\interoperability\ShipperRegister;
 use ship\interoperability\SLanguage as Language;
@@ -802,6 +803,7 @@ abstract class ModifyProtocol extends Protocol {
      * @param array $context A mapping from the template objects to real objects.
      * @param string $environment The environment.
      * @return $this
+     * @throws Exception
      */
     public function doIt(string $name, array $context = [], string $environment = 'global') : static {
         $this->protocol[] = [

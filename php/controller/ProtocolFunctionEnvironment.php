@@ -5,7 +5,7 @@ namespace ship\controllers;
 use ship\protocols\TemplateProtocol;
 
 /**
- * Interface EventAdder.
+ * Interface ProtocolFunctionEnvironment.
  *
  * <p>An interface being required to define {@link TemplateProtocol} and register them to {@link ActionRegister}.</p>
  *
@@ -15,7 +15,7 @@ use ship\protocols\TemplateProtocol;
  * @author Dr. Dipl.-Inf. Thomas M. Prinz
  * @version 1.2.0
  */
-interface EventAdder {
+interface ProtocolFunctionEnvironment {
 
     /**
      * Adds events (templates).

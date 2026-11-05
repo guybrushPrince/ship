@@ -24,7 +24,7 @@ use Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 /**
  * Class ActionRegister.
  *
- * <p>The core of <em>Ship</em>. {@link ShipController} and {@link EventAdder} will be registered on this
+ * <p>The core of <em>Ship</em>. {@link ShipController} and {@link ProtocolFunctionEnvironment} will be registered on this
  * {@link ActionRegister} to be available as APIs. Everything else is done by magic.</p>
  *
  * @package ship
@@ -99,7 +99,7 @@ class ActionRegister {
      * Binds the events to the action register.
      * @param string[]|string $events
      */
-    public function bindEvents(array|string $events) : void {
+    public function bindProtocolFunctions(array|string $events) : void {
         $events = is_array($events) ? $events : [$events];
         foreach ($events as $event) {
             $event::add();

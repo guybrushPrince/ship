@@ -101,5 +101,15 @@ class TemplateObject {
     public static function _new(string $name, bool $asIs = false) : TemplateObject {
         return new TemplateObject($name, $asIs);
     }
+
+    /**
+     * Create a new template object.
+     * @param string $name The name.
+     * @param bool $asIs Whether the value of the parameter should be used as it is, or not.
+     * @return TemplateObject
+     */
+    public static function create(string $name, bool $asIs = false) : TemplateObject {
+        return self::_new($name, $asIs);
+    }
 }
 ?>
