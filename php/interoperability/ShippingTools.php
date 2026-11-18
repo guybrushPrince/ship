@@ -203,6 +203,28 @@ class ShippingTools {
     }
 
     /**
+     * Returns an object by id from an array.
+     * @param array $arr The array.
+     * @param IShippable|string|int $obj The object.
+     * @return array
+     */
+    public static function removeFromArray(array $arr, IShippable|string|int $obj) : array {
+        $isId = is_string($obj) || is_int($obj);
+        $oKey = $isId ? $obj : ShipperRegister::getKey($obj);
+
+        return array_filter($arr, function($a) use ($oKey, $obj) {
+            $aIsId = (is_string($a) || is_int($a));
+            $aKey = $aIsId ? $a : ShipperRegister::getKey($a);
+
+            if (is_int($aKey) && is_int($oKey) && ($aKey < 0 || $oKey < 0)) {
+                $aKey = spl_object_hash($a);
+                $oKey = spl_object_hash($obj);
+            }
+            return (get_class($a) !== get_class($obj)) || ($aKey !== $oKey);
+        });
+    }
+
+    /**
      * Generates an UUID.
      * @param string|null $data The data.
      * @return string
@@ -253,6 +275,18 @@ class ShippingTools {
      */
     public static function code(string $text, int $depth = 0, int $shelf = 4) : string {
         return sprintf("%'. " . ($depth * $shelf) . "s%s", "", $text);
+    }
+
+    /**
+     * Rearranges the code by splitting it up and giving it a depth.
+     * @param string $code The code.
+     * @param int $depth The depth.
+     * @return string
+     */
+    public static function rearrangeCode(string $code, int $depth = 0) : string {
+        return implode(PHP_EOL, array_map(function($c) use ($depth) {
+            return self::code($c, $depth);
+        }, explode(PHP_EOL, $code)));
     }
 
     /**
