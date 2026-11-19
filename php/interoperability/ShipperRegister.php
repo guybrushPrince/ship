@@ -47,6 +47,17 @@ class ShipperRegister {
     }
 
     /**
+     * Get the converted key of the shippable object.
+     * @param IShippable $shippable The shippable object.
+     * @return string
+     */
+    public static function getConvertedKey(IShippable $shippable) : string {
+        if (is_null(self::$shipper))
+            throw new Error('Please register an implementation of an AShipper.');
+        return self::$shipper->getConvertedKey($shippable);
+    }
+
+    /**
      * Get the class of the shippable object.
      * @param IShippable $shippable The shippable object.
      * @return string

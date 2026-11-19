@@ -26,6 +26,13 @@ abstract class AShipper {
     public abstract function getKey(IShippable $shippable) : string|int;
 
     /**
+     * Get the key of the shippable object but converted if necessary.
+     * @param IShippable $shippable The shippable object.
+     * @return string
+     */
+    public abstract function getConvertedKey(IShippable $shippable) : string;
+
+    /**
      * Whether the given object has a string key, or not.
      * @param IShippable|string $shippable The shipple object or class of the object.
      * @return bool
