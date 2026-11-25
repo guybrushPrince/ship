@@ -1,5 +1,6 @@
 {
     "name": "plds/ship",
+    "version": "1.0.0",
     "type": "library",
     "description": "Build web applications without wasting your time with (de-)serializing and view detection. Basic classes.",
     "keywords": [
