@@ -1,0 +1,42 @@
+{
+    "name": "plds/ship",
+    "type": "library",
+    "description": "Build web applications without wasting your time with (de-)serializing and view detection. Basic classes.",
+    "keywords": [
+        "html",
+        "views",
+        "ui",
+        "ship",
+        "php",
+        "rest",
+        "js",
+        "css"
+    ],
+    "homepage": "https://guybrushprince.github.io/webship",
+    "license": "Mozilla Public License Version 2.0",
+    "authors": [
+        {
+            "name": "Thomas M. Prinz",
+            "email": "Thomas.Prinz@uni-jena.de",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "slim/slim": "4.*",
+        "slim/psr7": "1.*"
+    },
+    "autoload": {
+        "classmap": [
+            "php/access",
+            "php/controller",
+            "php/exceptions",
+            "php/interoperability",
+            "php/middlewares",
+            "php/outputs",
+            "php/protocols",
+            "php/template",
+            "php/views"
+        ]
+    }
+}

@@ -3,9 +3,9 @@
 namespace ship\protocols;
 
 use ship\interoperability\ShippingTools;
+use ship\template\AShipFunction;
 use ship\template\TemplateObject;
 use ship\views\DirectView;
-use webship\JSFunction;
 
 /**
  * Class Protocol.
@@ -130,7 +130,7 @@ abstract class Protocol {
             array_filter(
                 array_map(function ($param) {
                     if ($param instanceof TemplateObject) return $param;
-                    else if ($param instanceof JSFunction) return $param;
+                    else if ($param instanceof AShipFunction) return $param;
                     else if (is_array($param)) return $this->collectParametersInArray($param);
                     else if ($param instanceof Protocol) return $param->collectParameters();
                     return false;
